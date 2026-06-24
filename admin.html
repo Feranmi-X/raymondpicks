@@ -1,0 +1,1803 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAYMONDPICKS — Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              bebas: ['"Bebas Neue"', "cursive"],
+              inter: ["Inter", "sans-serif"],
+            },
+            colors: {
+              gold: { DEFAULT: "#F0B429", dark: "#C88B00", light: "#FFD97D" },
+              surface: { DEFAULT: "#0F1420", 2: "#161D2E", 3: "#1E2840" },
+              ink: "#07090F",
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .shimmer-text {
+        background: linear-gradient(
+          90deg,
+          #c88b00,
+          #f0b429,
+          #fff0a0,
+          #f0b429,
+          #c88b00
+        );
+        background-size: 300% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shimmer 4s ease infinite;
+      }
+      @keyframes shimmer {
+        0%,
+        100% {
+          background-position: 0% center;
+        }
+        50% {
+          background-position: 100% center;
+        }
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.45);
+        transition: all 0.2s;
+      }
+      .nav-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+      }
+      .nav-item.active {
+        background: rgba(240, 180, 41, 0.12);
+        color: #f0b429;
+        border-left: 2px solid #f0b429;
+        border-radius: 0 10px 10px 0;
+      }
+      .nav-item svg {
+        flex-shrink: 0;
+      }
+
+      .toggle {
+        position: relative;
+        width: 40px;
+        height: 22px;
+      }
+      .toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 22px;
+        transition: 0.3s;
+      }
+      .slider:before {
+        content: "";
+        position: absolute;
+        height: 16px;
+        width: 16px;
+        left: 3px;
+        bottom: 3px;
+        background: #fff;
+        border-radius: 50%;
+        transition: 0.3s;
+      }
+      input:checked + .slider {
+        background: #22c55e;
+      }
+      input:checked + .slider:before {
+        transform: translateX(18px);
+      }
+
+      .page-section {
+        display: none;
+      }
+      .page-section.active {
+        display: block;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        text-align: left;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        color: rgba(255, 255, 255, 0.3);
+        text-transform: uppercase;
+        padding: 10px 14px;
+      }
+      td {
+        padding: 12px 14px;
+        font-size: 13px;
+        border-top: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      ::-webkit-scrollbar {
+        width: 4px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+      }
+      input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+      }
+
+      .pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #22c55e;
+        animation: pdot 2s infinite;
+      }
+      @keyframes pdot {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.45);
+        }
+        50% {
+          box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+        }
+      }
+
+      .stat-card {
+        background: rgba(22, 29, 46, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 16px;
+        padding: 20px;
+      }
+      .badge {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 99px;
+        letter-spacing: 0.06em;
+      }
+      .badge-green {
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.25);
+      }
+      .badge-gold {
+        background: rgba(240, 180, 41, 0.12);
+        color: #f0b429;
+        border: 1px solid rgba(240, 180, 41, 0.25);
+      }
+      .badge-blue {
+        background: rgba(59, 130, 246, 0.12);
+        color: #60a5fa;
+        border: 1px solid rgba(59, 130, 246, 0.25);
+      }
+      .badge-red {
+        background: rgba(239, 68, 68, 0.12);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.25);
+      }
+
+      .input-field {
+        width: 100%;
+        background: rgba(7, 9, 15, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 13px;
+        color: #fff;
+        outline: none;
+        transition: border-color 0.2s;
+        font-family: inherit;
+      }
+      .input-field:focus {
+        border-color: #f0b429;
+      }
+      .input-field::placeholder {
+        color: rgba(255, 255, 255, 0.2);
+      }
+
+      .btn-gold {
+        background: linear-gradient(135deg, #f0b429, #c88b00);
+        color: #07090f;
+        font-weight: 700;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 13px;
+        font-family: inherit;
+        transition: opacity 0.2s;
+        letter-spacing: 0.04em;
+      }
+      .btn-gold:hover {
+        opacity: 0.88;
+      }
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.6);
+        font-weight: 600;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 10px 18px;
+        cursor: pointer;
+        font-size: 13px;
+        font-family: inherit;
+        transition: all 0.2s;
+      }
+      .btn-ghost:hover {
+        border-color: rgba(240, 180, 41, 0.5);
+        color: #f0b429;
+      }
+      .btn-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: #f87171;
+        font-weight: 600;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        border-radius: 10px;
+        padding: 10px 18px;
+        cursor: pointer;
+        font-size: 13px;
+        font-family: inherit;
+        transition: all 0.2s;
+      }
+      .btn-danger:hover {
+        background: rgba(239, 68, 68, 0.2);
+      }
+
+      .section-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: rgba(255, 255, 255, 0.3);
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(6px);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .modal-box {
+        background: #161d2e;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        width: 100%;
+        max-width: 420px;
+        padding: 28px;
+        position: relative;
+      }
+
+      /* Config banner */
+      #config-banner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body class="font-inter bg-ink text-white min-h-screen flex">
+    <!-- ══ SUPABASE CONFIG ══════════════════════════════════════════════════════
+  STEP 1: Replace the two values below with your real Supabase credentials.
+  Find them in: Supabase Dashboard → Project Settings → API
+  ══════════════════════════════════════════════════════════════════════════ -->
+
+    <script>
+      // ── ADMIN AUTH ──
+      const ADMIN_PASSWORD = "Greatness1122!!"; // change this
+      const authed = sessionStorage.getItem("rp_admin");
+      if (!authed) {
+        const pw = prompt("Enter admin password:");
+        if (pw !== ADMIN_PASSWORD) {
+          document.body.innerHTML =
+            '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#fff;background:#07090f;font-size:1.2rem">⛔ Access Denied</div>';
+          throw new Error("Unauthorized");
+        }
+        sessionStorage.setItem("rp_admin", "1");
+      }
+      const SUPABASE_URL = "https://wtyqmqqobswhtqbikudr.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0eXFtcXFvYnN3aHRxYmlrdWRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMDA0ODgsImV4cCI6MjA5Nzg3NjQ4OH0.7YUUINCzWGLtMmvhFYXe2js9-c00eZ4IliqKhE5J3Ig";
+
+      const { createClient } = supabase;
+      const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside
+      class="w-60 flex-shrink-0 bg-surface border-r border-white/5 flex flex-col min-h-screen sticky top-0 h-screen overflow-y-auto"
+    >
+      <div class="p-5 border-b border-white/5">
+        <div class="font-bebas text-2xl shimmer-text leading-none">
+          RAYMONDPICKS
+        </div>
+        <div class="text-[10px] font-bold text-white/25 tracking-widest mt-1">
+          ADMIN PANEL
+        </div>
+      </div>
+      <nav class="flex-1 p-3 space-y-0.5 mt-2">
+        <div class="nav-item active" onclick="showSection('overview')">
+          <svg
+            width="16"
+            height="16"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          Overview
+        </div>
+        <div class="nav-item" onclick="showSection('users')">
+          <svg
+            width="16"
+            height="16"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+          </svg>
+          Users
+        </div>
+        <div class="nav-item" onclick="showSection('balances')">
+          <svg
+            width="16"
+            height="16"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="12" y1="1" x2="12" y2="23" />
+            <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+          </svg>
+          Balances
+        </div>
+        <div class="nav-item" onclick="showSection('payments')">
+          <svg
+            width="16"
+            height="16"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="1" y="4" width="22" height="16" rx="2" />
+            <line x1="1" y1="10" x2="23" y2="10" />
+          </svg>
+          Payment Info
+        </div>
+        <div class="nav-item" onclick="showSection('withdrawals')">
+          <svg
+            width="16"
+            height="16"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Withdrawals
+        </div>
+        <div class="pt-4 pb-1 px-2">
+          <div
+            class="text-[10px] font-bold text-white/15 tracking-widest uppercase"
+          >
+            System
+          </div>
+        </div>
+        <div class="nav-item" onclick="showSection('settings')">
+          <svg
+            width="16"
+            height="16"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+            />
+          </svg>
+          Settings
+        </div>
+      </nav>
+      <div class="p-4 border-t border-white/5">
+        <div class="flex items-center gap-3">
+          <div
+            class="w-8 h-8 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center font-bebas text-ink text-sm"
+          >
+            R
+          </div>
+          <div>
+            <div class="text-xs font-bold">Raymond</div>
+            <div class="text-[10px] text-white/30">Super Admin</div>
+          </div>
+          <div class="ml-auto pulse-dot"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ══ MAIN ══ -->
+    <main class="flex-1 overflow-y-auto min-h-screen">
+      <header
+        class="sticky top-0 z-40 bg-ink/90 backdrop-blur-xl border-b border-white/5 px-6 py-3.5 flex items-center justify-between"
+      >
+        <div>
+          <span
+            id="page-title"
+            class="font-bebas text-xl text-white tracking-wide"
+            >Overview</span
+          >
+          <span class="text-white/25 text-xs ml-2" id="page-sub"
+            >Dashboard summary</span
+          >
+        </div>
+        <div class="flex items-center gap-3">
+          <div
+            class="flex items-center gap-2 bg-green-400/10 border border-green-400/20 rounded-full px-3 py-1.5"
+          >
+            <div class="pulse-dot" style="width: 6px; height: 6px"></div>
+            <span class="text-green-400 text-xs font-bold" id="live-count"
+              >— Online</span
+            >
+          </div>
+          <div class="text-white/25 text-xs" id="clock"></div>
+        </div>
+      </header>
+
+      <div class="p-6 space-y-6">
+        <!-- ══ OVERVIEW ══ -->
+        <section class="page-section active space-y-6" id="section-overview">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="stat-card">
+              <div class="section-label">Total Users</div>
+              <div
+                class="font-bebas text-4xl text-white leading-none"
+                id="ov-total-users"
+              >
+                —
+              </div>
+              <div class="text-white/30 text-xs mt-2">All members</div>
+            </div>
+            <div class="stat-card">
+              <div class="section-label">Total Deposited</div>
+              <div
+                class="font-bebas text-4xl text-gold leading-none"
+                id="ov-total-deposited"
+              >
+                —
+              </div>
+              <div class="text-white/30 text-xs mt-2">Cumulative</div>
+            </div>
+            <div class="stat-card">
+              <div class="section-label">Total Balance</div>
+              <div
+                class="font-bebas text-4xl text-green-400 leading-none"
+                id="ov-total-balance"
+              >
+                —
+              </div>
+              <div class="text-white/30 text-xs mt-2">Across all users</div>
+            </div>
+            <div class="stat-card">
+              <div class="section-label">Pending Withdrawals</div>
+              <div
+                class="font-bebas text-4xl text-red-400 leading-none"
+                id="ov-pending-w"
+              >
+                —
+              </div>
+              <div class="text-white/30 text-xs mt-2">Awaiting action</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="stat-card">
+              <div class="section-label mb-4">Members by Plan</div>
+              <div id="plan-breakdown" class="space-y-3">
+                <div class="text-white/30 text-sm">Loading…</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="section-label mb-4">Revenue by Payment Method</div>
+              <div class="space-y-3">
+                <div
+                  class="flex items-center justify-between py-2 border-b border-white/4"
+                >
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">💚</span
+                    ><span class="text-sm text-white/60">Chime</span>
+                  </div>
+                  <span class="font-bold text-white">$213,400</span>
+                </div>
+                <div
+                  class="flex items-center justify-between py-2 border-b border-white/4"
+                >
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">💜</span
+                    ><span class="text-sm text-white/60">Zelle</span>
+                  </div>
+                  <span class="font-bold text-white">$289,700</span>
+                </div>
+                <div
+                  class="flex items-center justify-between py-2 border-b border-white/4"
+                >
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">🍎</span
+                    ><span class="text-sm text-white/60">Apple Pay</span>
+                  </div>
+                  <span class="font-bold text-white">$156,900</span>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg">₿</span
+                    ><span class="text-sm text-white/60">Bitcoin</span>
+                  </div>
+                  <span class="font-bold text-white">$88,200</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ USERS ══ -->
+        <section class="page-section space-y-5" id="section-users">
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-3">
+              <input
+                type="text"
+                class="input-field"
+                style="width: 240px"
+                placeholder="Search by name or email…"
+                oninput="filterUsers(this.value)"
+              />
+              <select
+                class="input-field"
+                style="width: 150px"
+                onchange="filterUsersPlan(this.value)"
+              >
+                <option value="all">All Plans</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+                <option value="lifetime">Lifetime</option>
+              </select>
+            </div>
+            <button class="btn-gold" onclick="openAddUserModal()">
+              + Add User
+            </button>
+          </div>
+          <div class="stat-card overflow-x-auto p-0">
+            <table id="users-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Plan</th>
+                  <th>Status</th>
+                  <th>Deposited</th>
+                  <th>Balance</th>
+                  <th>Joined</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody">
+                <tr>
+                  <td
+                    colspan="7"
+                    style="
+                      text-align: center;
+                      padding: 32px;
+                      color: rgba(255, 255, 255, 0.25);
+                    "
+                  >
+                    Loading…
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ══ BALANCES ══ -->
+        <section class="page-section space-y-5" id="section-balances">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="stat-card">
+              <div class="section-label">Total Available Balance</div>
+              <div
+                class="font-bebas text-4xl text-green-400 leading-none"
+                id="bal-available-total"
+              >
+                —
+              </div>
+              <div class="text-white/30 text-xs mt-2">Across all users</div>
+            </div>
+            <div class="stat-card">
+              <div class="section-label">Total Deposited</div>
+              <div
+                class="font-bebas text-4xl text-gold leading-none"
+                id="bal-deposited-total"
+              >
+                —
+              </div>
+              <div class="text-white/30 text-xs mt-2">Cumulative</div>
+            </div>
+            <div class="stat-card">
+              <div class="section-label">Bulk Balance Update</div>
+              <div class="space-y-3 mt-2">
+                <select class="input-field" id="bulk-plan-filter">
+                  <option value="all">All Users</option>
+                  <option value="monthly">Monthly only</option>
+                  <option value="yearly">Yearly only</option>
+                  <option value="lifetime">Lifetime only</option>
+                </select>
+                <div class="flex gap-2">
+                  <input
+                    type="number"
+                    class="input-field"
+                    id="bulk-amount"
+                    placeholder="Amount ($)"
+                  />
+                  <button
+                    class="btn-gold whitespace-nowrap"
+                    onclick="bulkUpdateBalance()"
+                  >
+                    Set All
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="stat-card overflow-x-auto p-0">
+            <div
+              class="px-5 py-4 border-b border-white/5 flex items-center justify-between"
+            >
+              <div class="font-semibold text-sm">Per-User Balance Manager</div>
+              <div class="text-white/30 text-xs">
+                Click Edit to update a user's balance
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Plan</th>
+                  <th>Available Balance</th>
+                  <th>Deposited</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="balances-tbody">
+                <tr>
+                  <td
+                    colspan="5"
+                    style="
+                      text-align: center;
+                      padding: 32px;
+                      color: rgba(255, 255, 255, 0.25);
+                    "
+                  >
+                    Loading…
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ══ PAYMENT INFO ══ -->
+        <section class="page-section space-y-5" id="section-payments">
+          <p class="text-white/40 text-sm">
+            Edit payment addresses shown to users at checkout. Changes are saved
+            to Supabase and apply immediately.
+          </p>
+
+          <!-- Chime -->
+          <div class="stat-card space-y-4">
+            <div class="flex items-center gap-3 mb-2">
+              <div
+                class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                style="
+                  background: rgba(6, 193, 103, 0.15);
+                  border: 1px solid rgba(6, 193, 103, 0.3);
+                "
+              >
+                💚
+              </div>
+              <div>
+                <div class="font-bold">Chime</div>
+                <div class="text-white/30 text-xs">$Tag and phone number</div>
+              </div>
+              <div class="ml-auto">
+                <span class="badge badge-green">ACTIVE</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <div class="section-label">Chime $Tag</div>
+                <input
+                  type="text"
+                  class="input-field"
+                  id="chime-tag"
+                  placeholder="$RaymondPicks"
+                />
+              </div>
+              <div>
+                <div class="section-label">Phone Number</div>
+                <input
+                  type="text"
+                  class="input-field"
+                  id="chime-phone"
+                  placeholder="(305) 555-0142"
+                />
+              </div>
+            </div>
+            <button class="btn-gold" onclick="savePayment('chime')">
+              Save Chime Info
+            </button>
+          </div>
+
+          <!-- Zelle -->
+          <div class="stat-card space-y-4">
+            <div class="flex items-center gap-3 mb-2">
+              <div
+                class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                style="
+                  background: rgba(139, 92, 246, 0.15);
+                  border: 1px solid rgba(139, 92, 246, 0.3);
+                "
+              >
+                💜
+              </div>
+              <div>
+                <div class="font-bold">Zelle</div>
+                <div class="text-white/30 text-xs">Email and phone number</div>
+              </div>
+              <div class="ml-auto">
+                <span class="badge badge-green">ACTIVE</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <div class="section-label">Zelle Email</div>
+                <input
+                  type="email"
+                  class="input-field"
+                  id="zelle-email"
+                  placeholder="pay@raymondpicks.com"
+                />
+              </div>
+              <div>
+                <div class="section-label">Phone Number</div>
+                <input
+                  type="text"
+                  class="input-field"
+                  id="zelle-phone"
+                  placeholder="(305) 555-0142"
+                />
+              </div>
+            </div>
+            <button class="btn-gold" onclick="savePayment('zelle')">
+              Save Zelle Info
+            </button>
+          </div>
+
+          <!-- Apple Pay -->
+          <div class="stat-card space-y-4">
+            <div class="flex items-center gap-3 mb-2">
+              <div
+                class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                style="
+                  background: rgba(255, 255, 255, 0.08);
+                  border: 1px solid rgba(255, 255, 255, 0.15);
+                "
+              >
+                🍎
+              </div>
+              <div>
+                <div class="font-bold">Apple Pay</div>
+                <div class="text-white/30 text-xs">iCloud email</div>
+              </div>
+              <div class="ml-auto">
+                <span class="badge badge-green">ACTIVE</span>
+              </div>
+            </div>
+            <div>
+              <div class="section-label">Apple ID (iCloud Email)</div>
+              <input
+                type="email"
+                class="input-field"
+                id="apple-id"
+                placeholder="raymondpicks@icloud.com"
+              />
+            </div>
+            <button class="btn-gold" onclick="savePayment('apple')">
+              Save Apple Pay Info
+            </button>
+          </div>
+
+          <!-- Bitcoin -->
+          <div class="stat-card space-y-4">
+            <div class="flex items-center gap-3 mb-2">
+              <div
+                class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                style="
+                  background: rgba(251, 146, 60, 0.15);
+                  border: 1px solid rgba(251, 146, 60, 0.3);
+                "
+              >
+                ₿
+              </div>
+              <div>
+                <div class="font-bold">Bitcoin</div>
+                <div class="text-white/30 text-xs">BTC wallet address</div>
+              </div>
+              <div class="ml-auto">
+                <span class="badge badge-gold">CRYPTO</span>
+              </div>
+            </div>
+            <div>
+              <div class="section-label">Bitcoin Wallet Address</div>
+              <input
+                type="text"
+                class="input-field font-mono"
+                id="btc-address"
+                placeholder="bc1q…"
+              />
+            </div>
+            <div
+              class="bg-orange-400/5 border border-orange-400/15 rounded-xl p-3 text-xs text-orange-300/70 leading-relaxed"
+            >
+              ⚠️ Double-check every character before saving. Bitcoin
+              transactions are irreversible.
+            </div>
+            <button class="btn-gold" onclick="savePayment('bitcoin')">
+              Save Bitcoin Address
+            </button>
+          </div>
+        </section>
+
+        <!-- ══ WITHDRAWALS ══ -->
+        <section class="page-section space-y-5" id="section-withdrawals">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="stat-card">
+              <div class="section-label">Pending</div>
+              <div
+                class="font-bebas text-4xl text-yellow-400 leading-none"
+                id="w-pending-ct"
+              >
+                —
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="section-label">Approved</div>
+              <div
+                class="font-bebas text-4xl text-green-400 leading-none"
+                id="w-approved-ct"
+              >
+                —
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="section-label">Total Requests</div>
+              <div
+                class="font-bebas text-4xl text-gold leading-none"
+                id="w-total-ct"
+              >
+                —
+              </div>
+            </div>
+          </div>
+          <div class="stat-card overflow-x-auto p-0">
+            <div class="px-5 py-4 border-b border-white/5">
+              <div class="font-semibold text-sm">Withdrawal Requests</div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Amount</th>
+                  <th>Method</th>
+                  <th>Account</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="withdrawals-tbody">
+                <tr>
+                  <td
+                    colspan="7"
+                    style="
+                      text-align: center;
+                      padding: 32px;
+                      color: rgba(255, 255, 255, 0.25);
+                    "
+                  >
+                    Loading…
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ══ SETTINGS ══ -->
+        <section class="page-section space-y-5" id="section-settings">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="stat-card space-y-4">
+              <div class="font-semibold mb-1">Site Controls</div>
+              <div
+                class="flex items-center justify-between py-3 border-b border-white/5"
+              >
+                <div>
+                  <div class="text-sm font-semibold">
+                    Win Popup Notifications
+                  </div>
+                  <div class="text-white/30 text-xs">
+                    Show live win popups on landing page
+                  </div>
+                </div>
+                <label class="toggle"
+                  ><input
+                    type="checkbox"
+                    checked
+                    onchange="settingToggle(this, 'win-popup')" /><span
+                    class="slider"
+                  ></span
+                ></label>
+              </div>
+              <div
+                class="flex items-center justify-between py-3 border-b border-white/5"
+              >
+                <div>
+                  <div class="text-sm font-semibold">New Signups Enabled</div>
+                  <div class="text-white/30 text-xs">
+                    Allow new users to register
+                  </div>
+                </div>
+                <label class="toggle"
+                  ><input
+                    type="checkbox"
+                    checked
+                    onchange="settingToggle(this, 'signups')" /><span
+                    class="slider"
+                  ></span
+                ></label>
+              </div>
+              <div
+                class="flex items-center justify-between py-3 border-b border-white/5"
+              >
+                <div>
+                  <div class="text-sm font-semibold">Bitcoin Payments</div>
+                  <div class="text-white/30 text-xs">
+                    Show Bitcoin at checkout
+                  </div>
+                </div>
+                <label class="toggle"
+                  ><input
+                    type="checkbox"
+                    checked
+                    onchange="settingToggle(this, 'btc')" /><span
+                    class="slider"
+                  ></span
+                ></label>
+              </div>
+              <div class="flex items-center justify-between py-3">
+                <div>
+                  <div class="text-sm font-semibold">Maintenance Mode</div>
+                  <div class="text-white/30 text-xs">Block all user access</div>
+                </div>
+                <label class="toggle"
+                  ><input
+                    type="checkbox"
+                    onchange="settingToggle(this, 'maintenance')" /><span
+                    class="slider"
+                  ></span
+                ></label>
+              </div>
+            </div>
+
+            <div class="stat-card space-y-4">
+              <div class="font-semibold mb-1">Withdrawal PIN</div>
+              <p class="text-white/40 text-xs leading-relaxed">
+                Change the 5-digit PIN users must enter to confirm a withdrawal.
+              </p>
+              <div>
+                <div class="section-label">Current PIN</div>
+                <input
+                  type="password"
+                  class="input-field"
+                  id="current-pin"
+                  placeholder="Enter current PIN"
+                />
+              </div>
+              <div>
+                <div class="section-label">New PIN (5 digits)</div>
+                <input
+                  type="text"
+                  class="input-field"
+                  id="new-pin"
+                  maxlength="5"
+                  placeholder="e.g. 84921"
+                />
+              </div>
+              <div>
+                <div class="section-label">Confirm New PIN</div>
+                <input
+                  type="text"
+                  class="input-field"
+                  id="confirm-pin"
+                  maxlength="5"
+                  placeholder="Repeat PIN"
+                />
+              </div>
+              <div id="pin-err" class="text-red-400 text-xs hidden"></div>
+              <button class="btn-gold w-full" onclick="changePIN()">
+                Update Withdrawal PIN
+              </button>
+            </div>
+
+            <div class="stat-card space-y-4 md:col-span-2">
+              <div class="font-semibold mb-1">Plan Pricing</div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <div class="section-label">Monthly Price ($)</div>
+                  <input
+                    type="number"
+                    class="input-field"
+                    id="price-monthly"
+                    value="150"
+                  />
+                </div>
+                <div>
+                  <div class="section-label">Yearly Price ($)</div>
+                  <input
+                    type="number"
+                    class="input-field"
+                    id="price-yearly"
+                    value="1000"
+                  />
+                </div>
+                <div>
+                  <div class="section-label">Lifetime Price ($)</div>
+                  <input
+                    type="number"
+                    class="input-field"
+                    id="price-lifetime"
+                    value="1500"
+                  />
+                </div>
+              </div>
+              <button class="btn-gold" onclick="savePricing()">
+                Save Pricing
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- ══ EDIT BALANCE MODAL ══ -->
+    <div class="modal-overlay hidden" id="balance-modal">
+      <div class="modal-box">
+        <button
+          onclick="closeModal('balance-modal')"
+          class="absolute top-4 right-4 text-white/30 hover:text-white bg-transparent border-0 text-xl cursor-pointer"
+        >
+          ✕
+        </button>
+        <div class="font-bebas text-2xl text-white mb-1">EDIT BALANCES</div>
+        <div id="bm-user-name" class="text-white/40 text-sm mb-6"></div>
+        <div class="space-y-4">
+          <div>
+            <div class="section-label">Available Balance ($)</div>
+            <input
+              type="number"
+              class="input-field"
+              id="bm-available"
+              placeholder="0.00"
+              step="0.01"
+            />
+          </div>
+          <div>
+            <div class="section-label">Total Deposited ($)</div>
+            <input
+              type="number"
+              class="input-field"
+              id="bm-deposited"
+              placeholder="0.00"
+              step="0.01"
+            />
+          </div>
+          <div class="flex gap-3 pt-2">
+            <button class="btn-gold flex-1" onclick="saveBalance()">
+              Save Changes
+            </button>
+            <button class="btn-ghost" onclick="closeModal('balance-modal')">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ADD USER MODAL ══ -->
+    <div class="modal-overlay hidden" id="adduser-modal">
+      <div class="modal-box">
+        <button
+          onclick="closeModal('adduser-modal')"
+          class="absolute top-4 right-4 text-white/30 hover:text-white bg-transparent border-0 text-xl cursor-pointer"
+        >
+          ✕
+        </button>
+        <div class="font-bebas text-2xl text-white mb-5">ADD USER</div>
+        <div class="space-y-4">
+          <div>
+            <div class="section-label">Full Name</div>
+            <input
+              type="text"
+              class="input-field"
+              id="new-name"
+              placeholder="Jane Smith"
+            />
+          </div>
+          <div>
+            <div class="section-label">Email</div>
+            <input
+              type="email"
+              class="input-field"
+              id="new-email"
+              placeholder="jane@email.com"
+            />
+          </div>
+          <div>
+            <div class="section-label">Plan</div>
+            <select class="input-field" id="new-plan">
+              <option value="monthly">Monthly — $150/mo</option>
+              <option value="yearly">Yearly — $1,000/yr</option>
+              <option value="lifetime">Lifetime — $1,500</option>
+            </select>
+          </div>
+          <div>
+            <div class="section-label">Country</div>
+            <input
+              type="text"
+              class="input-field"
+              id="new-country"
+              placeholder="United States"
+            />
+          </div>
+          <div id="adduser-err" class="text-red-400 text-xs hidden"></div>
+          <div class="flex gap-3 pt-1">
+            <button class="btn-gold flex-1" onclick="addUser()">
+              Create User
+            </button>
+            <button class="btn-ghost" onclick="closeModal('adduser-modal')">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TOAST ══ -->
+    <div
+      id="toast"
+      style="
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        z-index: 200;
+        opacity: 0;
+        transition: all 0.3s;
+        white-space: nowrap;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        pointer-events: none;
+      "
+    ></div>
+
+    <script>
+      // your full key═══════════════════════════════════════════════════════
+      //  STATE
+      // ════════════════════════════════════════════════════════════
+      let allUsers = []; // cache from Supabase
+      let editingUserId = null;
+      let userFilter = "";
+      let planFilter = "all";
+      let currentPIN = "33211";
+
+      // ════════════════════════════════════════════════════════════
+      //  NAVIGATION
+      // ════════════════════════════════════════════════════════════
+      const sections = {
+        overview: "Overview",
+        users: "Users",
+        balances: "Balances",
+        payments: "Payment Info",
+        withdrawals: "Withdrawals",
+        settings: "Settings",
+      };
+      const subs = {
+        overview: "Dashboard summary",
+        users: "Manage all members",
+        balances: "Adjust user balances",
+        payments: "Checkout payment details",
+        withdrawals: "Withdrawal requests",
+        settings: "System configuration",
+      };
+
+      function showSection(s) {
+        document
+          .querySelectorAll(".page-section")
+          .forEach((el) => el.classList.remove("active"));
+        document.getElementById("section-" + s).classList.add("active");
+        document.querySelectorAll(".nav-item").forEach((el) => {
+          el.classList.remove("active");
+          if (el.textContent.trim().toLowerCase().includes(s.slice(0, 5)))
+            el.classList.add("active");
+        });
+        document.getElementById("page-title").textContent = sections[s];
+        document.getElementById("page-sub").textContent = subs[s];
+        if (s === "users") loadUsers();
+        if (s === "balances") loadBalances();
+        if (s === "withdrawals") loadWithdrawals();
+        if (s === "payments") loadPaymentInfo();
+        if (s === "overview") loadOverview();
+      }
+
+      // ════════════════════════════════════════════════════════════
+      //  CLOCK
+      // ════════════════════════════════════════════════════════════
+      function updateClock() {
+        document.getElementById("clock").textContent =
+          new Date().toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      // ════════════════════════════════════════════════════════════
+      //  OVERVIEW
+      // ════════════════════════════════════════════════════════════
+      async function loadOverview() {
+        const { data: users, error } = await sb
+          .from("users")
+          .select("plan, deposited, balance");
+        if (error) {
+          console.error(error);
+          return;
+        }
+        allUsers = users;
+
+        const total = users.length;
+        const deposited = users.reduce(
+          (s, u) => s + parseFloat(u.deposited || 0),
+          0,
+        );
+        const balance = users.reduce(
+          (s, u) => s + parseFloat(u.balance || 0),
+          0,
+        );
+
+        document.getElementById("ov-total-users").textContent =
+          total.toLocaleString();
+        document.getElementById("ov-total-deposited").textContent =
+          "$" + deposited.toLocaleString();
+        document.getElementById("ov-total-balance").textContent =
+          "$" + balance.toFixed(2);
+
+        // Plan breakdown
+        const counts = { monthly: 0, yearly: 0, lifetime: 0 };
+        users.forEach((u) => {
+          if (counts[u.plan] !== undefined) counts[u.plan]++;
+        });
+        const max = Math.max(...Object.values(counts), 1);
+        document.getElementById("plan-breakdown").innerHTML = [
+          "monthly",
+          "yearly",
+          "lifetime",
+        ]
+          .map(
+            (p) => `
+    <div>
+      <div class="flex justify-between text-sm mb-1.5"><span class="text-white/60">${cap(p)}</span><span class="font-bold text-gold">${counts[p]}</span></div>
+      <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-gold to-gold-dark rounded-full" style="width:${Math.round((counts[p] / max) * 100)}%"></div>
+      </div>
+    </div>
+  `,
+          )
+          .join("");
+
+        // Pending withdrawals count
+        const { count } = await sb
+          .from("withdrawals")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending");
+        document.getElementById("ov-pending-w").textContent = count ?? 0;
+        document.getElementById("live-count").textContent =
+          users.filter((u) => u.status === "online").length + " Online";
+      }
+
+      // ════════════════════════════════════════════════════════════
+      //  USERS
+      // ════════════════════════════════════════════════════════════
+      async function loadUsers() {
+        const { data, error } = await sb
+          .from("users")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) {
+          toast("Error loading users: " + error.message, "#ef4444");
+          return;
+        }
+        allUsers = data || [];
+        renderUsers();
+      }
+
+      function filterUsers(val) {
+        userFilter = val.toLowerCase();
+        renderUsers();
+      }
+      function filterUsersPlan(val) {
+        planFilter = val;
+        renderUsers();
+      }
+
+      function renderUsers() {
+        const filtered = allUsers.filter((u) => {
+          const matchText =
+            !userFilter ||
+            u.name.toLowerCase().includes(userFilter) ||
+            u.email.toLowerCase().includes(userFilter);
+          const matchPlan = planFilter === "all" || u.plan === planFilter;
+          return matchText && matchPlan;
+        });
+        document.getElementById("users-tbody").innerHTML =
+          filtered
+            .map(
+              (u) => `
+    <tr>
+      <td><div class="font-semibold text-sm">${u.name}</div><div class="text-white/30 text-xs">${u.email}</div></td>
+      <td><span class="badge ${planBadge(u.plan)}">${u.plan.toUpperCase()}</span></td>
+      <td>
+        <div class="flex items-center gap-2">
+          <div style="width:7px;height:7px;border-radius:50%;background:${u.status === "online" ? "#22c55e" : "rgba(255,255,255,.2)"}"></div>
+          <span class="text-xs text-white/50">${u.status}</span>
+        </div>
+      </td>
+      <td class="text-gold font-bold">$${parseFloat(u.deposited || 0).toLocaleString()}</td>
+      <td class="text-green-400 font-bold">$${parseFloat(u.balance || 0).toFixed(2)}</td>
+      <td class="text-white/30 text-xs">${fmtDate(u.joined || u.created_at)}</td>
+      <td>
+        <div class="flex gap-2">
+          <button class="btn-ghost" style="padding:6px 12px;font-size:11px" onclick="openBalanceModal('${u.id}')">Edit Balance</button>
+          <button class="btn-danger" style="padding:6px 12px;font-size:11px" onclick="removeUser('${u.id}')">Remove</button>
+        </div>
+      </td>
+    </tr>
+  `,
+            )
+            .join("") ||
+          '<tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,.25);padding:32px">No users found</td></tr>';
+      }
+
+      async function removeUser(id) {
+        if (!confirm("Remove this user? This cannot be undone.")) return;
+        const { error } = await sb.from("users").delete().eq("id", id);
+        if (error) {
+          toast("Error: " + error.message, "#ef4444");
+          return;
+        }
+        toast("User removed");
+        loadUsers();
+      }
+
+      function openAddUserModal() {
+        document.getElementById("adduser-modal").classList.remove("hidden");
+      }
+
+      async function addUser() {
+        const name = document.getElementById("new-name").value.trim();
+        const email = document.getElementById("new-email").value.trim();
+        const plan = document.getElementById("new-plan").value;
+        const country =
+          document.getElementById("new-country").value.trim() || "US";
+        const err = document.getElementById("adduser-err");
+        if (!name || !email) {
+          err.textContent = "⚠ Name and email are required.";
+          err.classList.remove("hidden");
+          return;
+        }
+        if (!email.includes("@")) {
+          err.textContent = "⚠ Invalid email.";
+          err.classList.remove("hidden");
+          return;
+        }
+        err.classList.add("hidden");
+        const prices = { monthly: 150, yearly: 1000, lifetime: 1500 };
+        const { error } = await sb.from("users").insert([
+          {
+            name,
+            email,
+            plan,
+            country,
+            deposited: prices[plan],
+            balance: 0,
+            status: "offline",
+          },
+        ]);
+        if (error) {
+          err.textContent = "⚠ " + error.message;
+          err.classList.remove("hidden");
+          return;
+        }
+        document.getElementById("new-name").value = "";
+        document.getElementById("new-email").value = "";
+        document.getElementById("new-country").value = "";
+        closeModal("adduser-modal");
+        toast("User added ✅");
+        loadUsers();
+      }
+
+      // ════════════════════════════════════════════════════════════
+      //  BALANCES
+      // ════════════════════════════════════════════════════════════
+      async function loadBalances() {
+        const { data, error } = await sb
+          .from("users")
+          .select("*")
+          .order("name");
+        if (error) {
+          toast("Error: " + error.message, "#ef4444");
+          return;
+        }
+        allUsers = data || [];
+        renderBalances();
+      }
+
+      function renderBalances() {
+        let totalAvail = 0,
+          totalDep = 0;
+        allUsers.forEach((u) => {
+          totalAvail += parseFloat(u.balance || 0);
+          totalDep += parseFloat(u.deposited || 0);
+        });
+        document.getElementById("bal-available-total").textContent =
+          "$" + totalAvail.toFixed(2);
+        document.getElementById("bal-deposited-total").textContent =
+          "$" + totalDep.toLocaleString();
+
+        document.getElementById("balances-tbody").innerHTML = allUsers
+          .map(
+            (u) => `
+    <tr>
+      <td><div class="font-semibold text-sm">${u.name}</div><div class="text-white/30 text-xs">${u.email}</div></td>
+      <td><span class="badge ${planBadge(u.plan)}">${u.plan.toUpperCase()}</span></td>
+      <td class="text-green-400 font-bold">$${parseFloat(u.balance || 0).toFixed(2)}</td>
+      <td class="text-gold font-bold">$${parseFloat(u.deposited || 0).toLocaleString()}</td>
+      <td><button class="btn-ghost" style="padding:6px 12px;font-size:11px" onclick="openBalanceModal('${u.id}')">Edit</button></td>
+    </tr>
+  `,
+          )
+          .join("");
+      }
+
+      function openBalanceModal(id) {
+        editingUserId = id;
+        const u = allUsers.find((x) => x.id === id);
+        if (!u) return;
+        document.getElementById("bm-user-name").textContent =
+          u.name + " — " + u.email;
+        document.getElementById("bm-available").value = u.balance;
+        document.getElementById("bm-deposited").value = u.deposited;
+        document.getElementById("balance-modal").classList.remove("hidden");
+      }
+
+      async function saveBalance() {
+        const avail =
+          parseFloat(document.getElementById("bm-available").value) || 0;
+        const dep =
+          parseFloat(document.getElementById("bm-deposited").value) || 0;
+        const u = allUsers.find((x) => x.id === editingUserId);
+        const { error } = await sb
+          .from("users")
+          .update({ balance: avail, deposited: dep })
+          .eq("id", editingUserId);
+        if (error) {
+          toast("Error: " + error.message, "#ef4444");
+          return;
+        }
+        closeModal("balance-modal");
+        toast(
+          "Balance updated for " + (u?.name?.split(" ")[0] || "user") + " ✅",
+        );
+        // refresh whichever view is active
+        loadBalances();
+        loadUsers();
+      }
+
+      async function bulkUpdateBalance() {
+        const amount = parseFloat(document.getElementById("bulk-amount").value);
+        const plan = document.getElementById("bulk-plan-filter").value;
+        if (isNaN(amount)) {
+          toast("Enter a valid amount", "#ef4444");
+          return;
+        }
+        let query = sb.from("users").update({ balance: amount });
+        if (plan !== "all") query = query.eq("plan", plan);
+        const { error } = await query;
+        if (error) {
+          toast("Error: " + error.message, "#ef4444");
+          return;
+        }
+        toast("Bulk balance updated ✅");
+        loadBalances();
+      }
+
+      // ════════════════════════════════════════════════════════════
+      //  PAYMENT INFO
+      // ════════════════════════════════════════════════════════════
+      async function loadPaymentInfo() {
+        const { data, error } = await sb.from("payment_info").select("*");
+        if (error) {
+          toast("Error loading payment info", "#ef4444");
+          return;
+        }
+        data.forEach((row) => {
+          if (row.method === "chime") {
+            document.getElementById("chime-tag").value = row.field1 || "";
+            document.getElementById("chime-phone").value = row.field2 || "";
+          } else if (row.method === "zelle") {
+            document.getElementById("zelle-email").value = row.field1 || "";
+            document.getElementById("zelle-phone").value = row.field2 || "";
+          } else if (row.method === "apple") {
+            document.getElementById("apple-id").value = row.field1 || "";
+          } else if (row.method === "bitcoin") {
+            document.getElementById("btc-address").value = row.field1 || "";
+          }
+        });
+      }
+
+      async function savePayment(method) {
+        let updates = { updated_at: new Date().toISOString() };
+        if (method === "chime") {
+          updates.field1 = document.getElementById("chime-tag").value.trim();
+          updates.field2 = document.getElementById("chime-phone").value.trim();
+        } else if (method === "zelle") {
+          updates.field1 = document.getElementById("zelle-email").value.trim();
+          updates.field2 = document.getElementById("zelle-phone").value.trim();
+        } else if (method === "apple") {
+          updates.field1 = document.getElementById("apple-id").value.trim();
+        } else if (method === "bitcoin") {
+          updates.field1 = document.getElementById("btc-address").value.trim();
+        }
+        const { error } = await sb
+          .from("payment_info")
+          .update(updates)
+          .eq("method", method);
+        if (error) {
+          toast("Error: " + error.message, "#ef4444");
+          return;
+        }
+        toast(cap(method) + " info saved ✅");
+      }
+
+      // ════════════════════════════════════════════════════════════
+      //  WITHDRAWALS
+      // ════════════════════════════════════════════════════════════
+      async function loadWithdrawals() {
+        const { data, error } = await sb
+          .from("withdrawals")
+          .select("*")
+          .order("created_at", { ascending: false });
+        if (error) {
+          toast("Error: " + error.message, "#ef4444");
+          return;
+        }
+        const rows = data || [];
+        const pending = rows.filter((w) => w.status === "pending").length;
+        const approved = rows.filter((w) => w.status === "approved").length;
+        document.getElementById("w-pending-ct").textContent = pending;
+        document.getElementById("w-approved-ct").textContent = approved;
+        document.getElementById("w-total-ct").textContent = rows.length;
+        document.getElementById("ov-pending-w").textContent = pending;
+
+        document.getElementById("withdrawals-tbody").innerHTML =
+          rows
+            .map(
+              (w) => `
+    <tr>
+      <td class="font-semibold text-sm">${w.user_name}</td>
+      <td class="text-gold font-bold">$${parseFloat(w.amount || 0).toLocaleString()}</td>
+      <td class="text-white/50 text-xs">${w.method}</td>
+      <td class="text-white/40 text-xs font-mono">${w.account}</td>
+      <td class="text-white/30 text-xs">${fmtDate(w.created_at)}</td>
+      <td><span class="badge ${w.status === "approved" ? "badge-green" : w.status === "pending" ? "badge-gold" : "badge-red"}">${w.status.toUpperCase()}</span></td>
+      <td>
+        ${
+          w.status === "pending"
+            ? `
+          <div class="flex gap-2">
+            <button class="btn-gold" style="padding:6px 12px;font-size:11px" onclick="setWithdrawal('${w.id}','approved')">Approve</button>
+            <button class="btn-danger" style="padding:6px 12px;font-size:11px" onclick="setWithdrawal('${w.id}','rejected')">Reject</button>
+          </div>`
+            : '<span class="text-white/20 text-xs">—</span>'
+        }
+      </td>
+    </tr>
+  `,
+            )
+            .join("") ||
+          '<tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,.25);padding:32px">No withdrawal requests</td></tr>';
+      }
+
+      async function setWithdrawal(id, status) {
+        const { error } = await sb
+          .from("withdrawals")
+          .update({ status })
+          .eq("id", id);
+        if (error) {
+          toast("Error: " + error.message, "#ef4444");
+          return;
+        }
+        toast("Withdrawal " + status + " ✅");
+        loadWithdrawals();
+      }
+
+      // ════════════════════════════════════════════════════════════
+      //  SETTINGS
+      // ════════════════════════════════════════════════════════════
+      function settingToggle(el, key) {
+        toast(key.replace("-", " ") + (el.checked ? " enabled" : " disabled"));
+      }
+
+      let currentPINStore = "33211";
+      function changePIN() {
+        const cur = document.getElementById("current-pin").value;
+        const nw = document.getElementById("new-pin").value;
+        const conf = document.getElementById("confirm-pin").value;
+        const err = document.getElementById("pin-err");
+        err.classList.add("hidden");
+        if (cur !== currentPINStore) {
+          err.textContent = "⚠ Incorrect current PIN.";
+          err.classList.remove("hidden");
+          return;
+        }
+        if (!/^\d{5}$/.test(nw)) {
+          err.textContent = "⚠ PIN must be exactly 5 digits.";
+          err.classList.remove("hidden");
+          return;
+        }
+        if (nw !== conf) {
+          err.textContent = "⚠ PINs do not match.";
+          err.classList.remove("hidden");
+          return;
+        }
+        currentPINStore = nw;
+        document.getElementById("current-pin").value = "";
+        document.getElementById("new-pin").value = "";
+        document.getElementById("confirm-pin").value = "";
+        toast("Withdrawal PIN updated ✅");
+      }
+
+      function savePricing() {
+        toast("Pricing saved ✅");
+      }
+
+      // ════════════════════════════════════════════════════════════
+      //  UTILS
+      // ════════════════════════════════════════════════════════════
+      function closeModal(id) {
+        document.getElementById(id).classList.add("hidden");
+      }
+
+      function toast(msg, bg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.background = bg || "#22c55e";
+        t.style.color = "#fff";
+        t.style.opacity = "1";
+        t.style.transform = "translateX(-50%) translateY(0)";
+        setTimeout(() => {
+          t.style.opacity = "0";
+          t.style.transform = "translateX(-50%) translateY(20px)";
+        }, 3200);
+      }
+
+      function cap(s) {
+        return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+      }
+
+      function planBadge(plan) {
+        return plan === "lifetime"
+          ? "badge-gold"
+          : plan === "yearly"
+            ? "badge-blue"
+            : "badge-green";
+      }
+
+      function fmtDate(iso) {
+        if (!iso) return "—";
+        return new Date(iso).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+      }
+
+      // close modals on overlay click
+      document.querySelectorAll(".modal-overlay").forEach((m) =>
+        m.addEventListener("click", (e) => {
+          if (e.target === m) m.classList.add("hidden");
+        }),
+      );
+
+      // ════════════════════════════════════════════════════════════
+      //  INIT
+      // ════════════════════════════════════════════════════════════
+      loadOverview();
+    </script>
+  </body>
+</html>

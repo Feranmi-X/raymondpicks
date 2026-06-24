@@ -1,0 +1,3169 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RAYMONDPICKS – VIP Sports Picks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              bebas: ['"Bebas Neue"', "cursive"],
+              inter: ["Inter", "sans-serif"],
+            },
+            colors: {
+              gold: { DEFAULT: "#F0B429", dark: "#C88B00", light: "#FFD97D" },
+              surface: { DEFAULT: "#0F1420", 2: "#161D2E", 3: "#1E2840" },
+              ink: "#07090F",
+            },
+            keyframes: {
+              shimmer: {
+                "0%,100%": { backgroundPosition: "0% 50%" },
+                "50%": { backgroundPosition: "100% 50%" },
+              },
+              ticker: {
+                "0%": { transform: "translateX(0)" },
+                "100%": { transform: "translateX(-50%)" },
+              },
+              slideUp: {
+                from: { opacity: 0, transform: "translateY(16px)" },
+                to: { opacity: 1, transform: "translateY(0)" },
+              },
+              popIn: {
+                from: { transform: "translateX(-120%)" },
+                to: { transform: "translateX(0)" },
+              },
+              popOut: {
+                from: { transform: "translateX(0)" },
+                to: { transform: "translateX(-120%)" },
+              },
+              pulse: {
+                "0%,100%": { boxShadow: "0 0 0 0 rgba(34,197,94,.45)" },
+                "50%": { boxShadow: "0 0 0 7px rgba(34,197,94,0)" },
+              },
+            },
+            animation: {
+              shimmer: "shimmer 4s ease infinite",
+              ticker: "ticker 30s linear infinite",
+              slideUp: "slideUp .35s ease both",
+              popIn: "popIn .45s cubic-bezier(.34,1.56,.64,1) forwards",
+              popOut: "popOut .35s ease forwards",
+              pulse: "pulse 2s infinite",
+            },
+          },
+        },
+      };
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Shimmer text */
+      .shimmer-text {
+        background: linear-gradient(
+          90deg,
+          #c88b00,
+          #f0b429,
+          #fff0a0,
+          #f0b429,
+          #c88b00
+        );
+        background-size: 300% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shimmer 4s ease infinite;
+      }
+      @keyframes shimmer {
+        0%,
+        100% {
+          background-position: 0% center;
+        }
+        50% {
+          background-position: 100% center;
+        }
+      }
+
+      /* Ticker */
+      .ticker-inner {
+        display: flex;
+        gap: 60px;
+        animation: ticker 30s linear infinite;
+        white-space: nowrap;
+      }
+      @keyframes ticker {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+
+      /* Win popup animations */
+      .win-show {
+        animation: popIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      }
+      .win-hide {
+        animation: popOut 0.35s ease forwards;
+      }
+      @keyframes popIn {
+        from {
+          transform: translateX(-130%);
+        }
+        to {
+          transform: translateX(0);
+        }
+      }
+      @keyframes popOut {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-130%);
+        }
+      }
+
+      /* NBA hero background */
+      .nba-hero {
+        background-image: url("https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1600&q=80");
+        background-size: cover;
+        background-position: center top;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 5px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+      }
+
+      /* Page hide/show */
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+
+      /* Plan selected ring */
+      .plan-selected {
+        border-color: #f0b429 !important;
+        box-shadow: 0 0 0 3px rgba(240, 180, 41, 0.2);
+      }
+
+      /* Dark/light input */
+      select option {
+        background: #0f1420;
+        color: #fff;
+      }
+      html:not(.dark) select option {
+        background: #fff;
+        color: #111;
+      }
+
+      /* PIN shake */
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-6px);
+        }
+        40% {
+          transform: translateX(6px);
+        }
+        60% {
+          transform: translateX(-4px);
+        }
+        80% {
+          transform: translateX(4px);
+        }
+      }
+    </style>
+  </head>
+
+  <body
+    class="font-inter bg-ink dark:bg-ink text-white min-h-screen transition-colors duration-300"
+  >
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- TICKER -->
+    <!-- ══════════════════════════════════════════════ -->
+    <div class="bg-gold overflow-hidden py-1.5">
+      <div class="ticker-inner flex">
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >🏒 NHL: Oilers vs Panthers – Game 5 Tonight</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >🏀 NBA Finals: Celtics -3.5 | RAYMOND PICK ✅</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >🏈 NFL: Chiefs Futures Value Alert</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >⚾ MLB: Dodgers ML Hit +140 | WIN ✅</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >⚽ EPL: Man City vs Arsenal | Preview Out</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >🏒 McDavid O1.5 Points | RAYMOND PICK ✅</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >🏀 Warriors vs Thunder — Spread Play</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >⚾ Yankees O8.5 | WIN ✅</span
+        >
+        <!-- dupe for seamless loop -->
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >🏒 NHL: Oilers vs Panthers – Game 5 Tonight</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >🏀 NBA Finals: Celtics -3.5 | RAYMOND PICK ✅</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >🏈 NFL: Chiefs Futures Value Alert</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >⚾ MLB: Dodgers ML Hit +140 | WIN ✅</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >⚽ EPL: Man City vs Arsenal | Preview Out</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >🏒 McDavid O1.5 Points | RAYMOND PICK ✅</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >🏀 Warriors vs Thunder — Spread Play</span
+        >
+        <span class="text-xs font-bold text-ink tracking-widest"
+          >⚾ Yankees O8.5 | WIN ✅</span
+        >
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- NAV -->
+    <!-- ══════════════════════════════════════════════ -->
+    <nav
+      class="sticky top-0 z-50 bg-ink/90 backdrop-blur-xl border-b border-white/5 px-4 md:px-8 py-3 flex items-center justify-between"
+    >
+      <button
+        onclick="showPage('landing')"
+        class="font-bebas text-3xl shimmer-text bg-transparent border-0 cursor-pointer"
+      >
+        RAYMONDPICKS
+      </button>
+      <div class="flex items-center gap-2">
+        <button
+          onclick="toggleTheme()"
+          id="themeBtn"
+          class="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 text-xs font-semibold text-white/70 hover:border-gold transition-colors"
+        >
+          <span id="themeIco">☀️</span
+          ><span id="themeLbl" class="hidden sm:inline">Light</span>
+        </button>
+        <button
+          id="nav-signin-btn"
+          onclick="showPage('signin')"
+          class="border border-gold/60 text-gold px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-gold hover:text-ink transition-all"
+        >
+          Sign In
+        </button>
+        <button
+          id="nav-join-btn"
+          onclick="showPage('signup')"
+          class="bg-gradient-to-r from-gold to-gold-dark text-ink px-4 py-1.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity"
+        >
+          Join VIP
+        </button>
+      </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- LANDING PAGE -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <div class="page active" id="page-landing">
+      <!-- ─── NBA HERO ─── -->
+      <section
+        class="nba-hero relative min-h-screen flex flex-col items-center justify-center text-center px-4 py-24 overflow-hidden"
+      >
+        <!-- Dark overlay -->
+        <div
+          class="absolute inset-0 bg-gradient-to-b from-ink/80 via-ink/60 to-ink"
+        ></div>
+        <!-- Gold radial glow -->
+        <div
+          class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(240,180,41,0.12),transparent_65%)]"
+        ></div>
+
+        <div class="relative z-10 flex flex-col items-center animate-slideUp">
+          <!-- Live badge -->
+          <div
+            class="flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-full px-4 py-1.5 mb-6"
+          >
+            <span
+              class="w-2 h-2 rounded-full bg-green-400"
+              style="animation: pulse 2s infinite"
+            ></span>
+            <span class="text-gold text-xs font-bold tracking-[.14em]"
+              >LIVE PICKS DROPPING NOW</span
+            >
+          </div>
+
+          <!-- Brand -->
+          <h1 class="font-bebas leading-none mb-4">
+            <span
+              class="shimmer-text"
+              style="font-size: clamp(5rem, 14vw, 9rem)"
+              >RAYMOND</span
+            ><br />
+            <span class="text-white" style="font-size: clamp(5rem, 14vw, 9rem)"
+              >PICKS</span
+            >
+          </h1>
+
+          <p
+            class="text-white/60 text-base md:text-lg max-w-md leading-relaxed mb-10"
+          >
+            Premium VIP sports picks with a proven 74% win rate. NFL, NBA, MLB,
+            NHL, Soccer — we cover every game that matters.
+          </p>
+
+          <!-- Stats -->
+          <div class="grid grid-cols-3 gap-3 mb-10 w-full max-w-sm">
+            <div
+              class="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl py-3 px-2 text-center"
+            >
+              <div class="font-bebas text-3xl text-gold leading-none">74%</div>
+              <div
+                class="text-white/40 text-[10px] uppercase tracking-widest mt-1"
+              >
+                Win Rate
+              </div>
+            </div>
+            <div
+              class="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl py-3 px-2 text-center"
+            >
+              <div class="font-bebas text-3xl text-gold leading-none">5K+</div>
+              <div
+                class="text-white/40 text-[10px] uppercase tracking-widest mt-1"
+              >
+                Members
+              </div>
+            </div>
+            <div
+              class="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl py-3 px-2 text-center"
+            >
+              <div class="font-bebas text-3xl text-gold leading-none">$2M+</div>
+              <div
+                class="text-white/40 text-[10px] uppercase tracking-widest mt-1"
+              >
+                Won
+              </div>
+            </div>
+          </div>
+
+          <!-- CTAs -->
+          <div class="flex flex-wrap gap-3 justify-center">
+            <button
+              onclick="showPage('signup')"
+              class="bg-gradient-to-r from-gold to-gold-dark text-ink font-bold px-8 py-3.5 rounded-xl text-base tracking-wider hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[0_8px_30px_rgba(240,180,41,.35)]"
+            >
+              🔥 JOIN VIP NOW
+            </button>
+            <button
+              onclick="
+                document
+                  .getElementById('books-section')
+                  .scrollIntoView({ behavior: 'smooth' })
+              "
+              class="border border-white/20 text-white/80 px-6 py-3.5 rounded-xl text-base font-semibold hover:border-gold hover:text-gold transition-all"
+            >
+              Our Sportsbooks ↓
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── SPORTSBOOKS ─── -->
+      <section id="books-section" class="max-w-6xl mx-auto w-full px-4 py-16">
+        <div class="flex items-center gap-4 mb-3 flex-wrap">
+          <h2 class="font-bebas text-4xl text-white">TOP SPORTSBOOKS</h2>
+          <div
+            class="h-px flex-1 min-w-[30px] bg-gradient-to-r from-gold to-transparent"
+          ></div>
+        </div>
+        <p class="text-white/35 text-sm mb-8">
+          Our VIP picks are verified across these platforms. Win rates reflect
+          member performance using Raymond's picks.
+        </p>
+
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+          id="books-grid"
+        >
+          <!-- FanDuel -->
+          <div
+            class="group bg-surface/70 border border-white/8 rounded-2xl p-5 hover:border-gold/40 hover:-translate-y-1 transition-all cursor-pointer"
+            onclick="openBook('https://fanduel.com')"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl font-extrabold"
+                style="
+                  background: linear-gradient(135deg, #1a6ef5, #0d47b5);
+                  color: #fff;
+                  font-family: &quot;Bebas Neue&quot;, cursive;
+                  font-size: 1rem;
+                  letter-spacing: 0.04em;
+                "
+              >
+                FD
+              </div>
+              <span
+                class="text-[10px] font-bold bg-green-400/10 border border-green-400/25 text-green-400 px-2 py-1 rounded-full tracking-widest"
+                >TOP PICK</span
+              >
+            </div>
+            <div class="font-bold text-base text-white mb-0.5">FanDuel</div>
+            <div class="text-white/35 text-xs mb-4">
+              Best odds + huge promos
+            </div>
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="text-white/40">Raymond Win Rate</span
+                ><span class="font-bold text-green-400">82%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400"
+                  style="width: 82%"
+                ></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Total Wins
+                </div>
+                <div class="font-bebas text-xl text-gold">1,247</div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Members
+                </div>
+                <div class="font-bebas text-xl text-gold">2.1K+</div>
+              </div>
+            </div>
+            <div
+              class="mt-4 w-full bg-white/5 border border-white/10 group-hover:bg-gold group-hover:border-gold group-hover:text-ink text-white/40 text-xs font-bold py-2 rounded-lg text-center transition-all"
+            >
+              Visit FanDuel →
+            </div>
+          </div>
+
+          <!-- DraftKings -->
+          <div
+            class="group bg-surface/70 border border-white/8 rounded-2xl p-5 hover:border-gold/40 hover:-translate-y-1 transition-all cursor-pointer"
+            onclick="openBook('https://draftkings.com')"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-extrabold"
+                style="
+                  background: linear-gradient(135deg, #3d5a00, #537a00);
+                  color: #b5e34d;
+                  font-family: &quot;Bebas Neue&quot;, cursive;
+                  letter-spacing: 0.04em;
+                "
+              >
+                DK
+              </div>
+              <span
+                class="text-[10px] font-bold bg-green-400/10 border border-green-400/25 text-green-400 px-2 py-1 rounded-full tracking-widest"
+                >TOP PICK</span
+              >
+            </div>
+            <div class="font-bold text-base text-white mb-0.5">DraftKings</div>
+            <div class="text-white/35 text-xs mb-4">Best same-game parlays</div>
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="text-white/40">Raymond Win Rate</span
+                ><span class="font-bold text-green-400">79%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400"
+                  style="width: 79%"
+                ></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Total Wins
+                </div>
+                <div class="font-bebas text-xl text-gold">1,089</div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Members
+                </div>
+                <div class="font-bebas text-xl text-gold">1.8K+</div>
+              </div>
+            </div>
+            <div
+              class="mt-4 w-full bg-white/5 border border-white/10 group-hover:bg-gold group-hover:border-gold group-hover:text-ink text-white/40 text-xs font-bold py-2 rounded-lg text-center transition-all"
+            >
+              Visit DraftKings →
+            </div>
+          </div>
+
+          <!-- PrizePicks -->
+          <div
+            class="group bg-surface/70 border border-white/8 rounded-2xl p-5 hover:border-gold/40 hover:-translate-y-1 transition-all cursor-pointer"
+            onclick="openBook('https://prizepicks.com')"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-extrabold"
+                style="
+                  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+                  color: #ddd6fe;
+                  font-family: &quot;Bebas Neue&quot;, cursive;
+                  letter-spacing: 0.04em;
+                "
+              >
+                PP
+              </div>
+              <span
+                class="text-[10px] font-bold bg-gold/10 border border-gold/25 text-gold px-2 py-1 rounded-full tracking-widest"
+                >PROPS 🔥</span
+              >
+            </div>
+            <div class="font-bold text-base text-white mb-0.5">PrizePicks</div>
+            <div class="text-white/35 text-xs mb-4">
+              #1 player props platform
+            </div>
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="text-white/40">Raymond Win Rate</span
+                ><span class="font-bold text-green-400">84%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400"
+                  style="width: 84%"
+                ></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Total Wins
+                </div>
+                <div class="font-bebas text-xl text-gold">963</div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Members
+                </div>
+                <div class="font-bebas text-xl text-gold">1.4K+</div>
+              </div>
+            </div>
+            <div
+              class="mt-4 w-full bg-white/5 border border-white/10 group-hover:bg-gold group-hover:border-gold group-hover:text-ink text-white/40 text-xs font-bold py-2 rounded-lg text-center transition-all"
+            >
+              Visit PrizePicks →
+            </div>
+          </div>
+
+          <!-- BetMGM -->
+          <div
+            class="group bg-surface/70 border border-white/8 rounded-2xl p-5 hover:border-gold/40 hover:-translate-y-1 transition-all cursor-pointer"
+            onclick="openBook('https://betmgm.com')"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-extrabold"
+                style="
+                  background: linear-gradient(135deg, #c9a84c, #8b6914);
+                  color: #fff8e1;
+                  font-family: &quot;Bebas Neue&quot;, cursive;
+                  letter-spacing: 0.04em;
+                "
+              >
+                MGM
+              </div>
+              <span
+                class="text-[10px] font-bold bg-white/5 border border-white/10 text-white/40 px-2 py-1 rounded-full tracking-widest"
+                >TRUSTED</span
+              >
+            </div>
+            <div class="font-bold text-base text-white mb-0.5">BetMGM</div>
+            <div class="text-white/35 text-xs mb-4">
+              Vegas-grade odds &amp; boosts
+            </div>
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="text-white/40">Raymond Win Rate</span
+                ><span class="font-bold text-green-400">77%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400"
+                  style="width: 77%"
+                ></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Total Wins
+                </div>
+                <div class="font-bebas text-xl text-gold">834</div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Members
+                </div>
+                <div class="font-bebas text-xl text-gold">1.1K+</div>
+              </div>
+            </div>
+            <div
+              class="mt-4 w-full bg-white/5 border border-white/10 group-hover:bg-gold group-hover:border-gold group-hover:text-ink text-white/40 text-xs font-bold py-2 rounded-lg text-center transition-all"
+            >
+              Visit BetMGM →
+            </div>
+          </div>
+
+          <!-- Betway -->
+          <div
+            class="group bg-surface/70 border border-white/8 rounded-2xl p-5 hover:border-gold/40 hover:-translate-y-1 transition-all cursor-pointer"
+            onclick="openBook('https://betway.com')"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-extrabold"
+                style="
+                  background: linear-gradient(135deg, #00a651, #006b35);
+                  color: #d4f5e2;
+                  font-family: &quot;Bebas Neue&quot;, cursive;
+                  letter-spacing: 0.04em;
+                "
+              >
+                BW
+              </div>
+              <span
+                class="text-[10px] font-bold bg-white/5 border border-white/10 text-white/40 px-2 py-1 rounded-full tracking-widest"
+                >GLOBAL</span
+              >
+            </div>
+            <div class="font-bold text-base text-white mb-0.5">Betway</div>
+            <div class="text-white/35 text-xs mb-4">
+              Global coverage, great lines
+            </div>
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="text-white/40">Raymond Win Rate</span
+                ><span class="font-bold text-green-400">76%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400"
+                  style="width: 76%"
+                ></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Total Wins
+                </div>
+                <div class="font-bebas text-xl text-gold">712</div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Members
+                </div>
+                <div class="font-bebas text-xl text-gold">890+</div>
+              </div>
+            </div>
+            <div
+              class="mt-4 w-full bg-white/5 border border-white/10 group-hover:bg-gold group-hover:border-gold group-hover:text-ink text-white/40 text-xs font-bold py-2 rounded-lg text-center transition-all"
+            >
+              Visit Betway →
+            </div>
+          </div>
+
+          <!-- Bet365 -->
+          <div
+            class="group bg-surface/70 border border-white/8 rounded-2xl p-5 hover:border-gold/40 hover:-translate-y-1 transition-all cursor-pointer"
+            onclick="openBook('https://bet365.com')"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-extrabold"
+                style="
+                  background: linear-gradient(135deg, #027b5b, #014d3a);
+                  color: #b3f0dc;
+                  font-family: &quot;Bebas Neue&quot;, cursive;
+                  letter-spacing: 0.04em;
+                "
+              >
+                365
+              </div>
+              <span
+                class="text-[10px] font-bold bg-white/5 border border-white/10 text-white/40 px-2 py-1 rounded-full tracking-widest"
+                >GLOBAL</span
+              >
+            </div>
+            <div class="font-bold text-base text-white mb-0.5">Bet365</div>
+            <div class="text-white/35 text-xs mb-4">
+              World's largest sportsbook
+            </div>
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="text-white/40">Raymond Win Rate</span
+                ><span class="font-bold text-green-400">78%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400"
+                  style="width: 78%"
+                ></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Total Wins
+                </div>
+                <div class="font-bebas text-xl text-gold">991</div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Members
+                </div>
+                <div class="font-bebas text-xl text-gold">1.3K+</div>
+              </div>
+            </div>
+            <div
+              class="mt-4 w-full bg-white/5 border border-white/10 group-hover:bg-gold group-hover:border-gold group-hover:text-ink text-white/40 text-xs font-bold py-2 rounded-lg text-center transition-all"
+            >
+              Visit Bet365 →
+            </div>
+          </div>
+
+          <!-- Underdog -->
+          <div
+            class="group bg-surface/70 border border-white/8 rounded-2xl p-5 hover:border-gold/40 hover:-translate-y-1 transition-all cursor-pointer"
+            onclick="openBook('https://underdogfantasy.com')"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-extrabold"
+                style="
+                  background: linear-gradient(135deg, #dc2626, #991b1b);
+                  color: #fecaca;
+                  font-family: &quot;Bebas Neue&quot;, cursive;
+                  letter-spacing: 0.04em;
+                "
+              >
+                UD
+              </div>
+              <span
+                class="text-[10px] font-bold bg-gold/10 border border-gold/25 text-gold px-2 py-1 rounded-full tracking-widest"
+                >RISING 📈</span
+              >
+            </div>
+            <div class="font-bold text-base text-white mb-0.5">
+              Underdog Fantasy
+            </div>
+            <div class="text-white/35 text-xs mb-4">Best pick'em platform</div>
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="text-white/40">Raymond Win Rate</span
+                ><span class="font-bold text-green-400">81%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400"
+                  style="width: 81%"
+                ></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Total Wins
+                </div>
+                <div class="font-bebas text-xl text-gold">748</div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Members
+                </div>
+                <div class="font-bebas text-xl text-gold">920+</div>
+              </div>
+            </div>
+            <div
+              class="mt-4 w-full bg-white/5 border border-white/10 group-hover:bg-gold group-hover:border-gold group-hover:text-ink text-white/40 text-xs font-bold py-2 rounded-lg text-center transition-all"
+            >
+              Visit Underdog →
+            </div>
+          </div>
+
+          <!-- Fliff -->
+          <div
+            class="group bg-surface/70 border border-white/8 rounded-2xl p-5 hover:border-gold/40 hover:-translate-y-1 transition-all cursor-pointer"
+            onclick="openBook('https://getfliff.com')"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-extrabold"
+                style="
+                  background: linear-gradient(135deg, #0ea5e9, #0369a1);
+                  color: #e0f2fe;
+                  font-family: &quot;Bebas Neue&quot;, cursive;
+                  letter-spacing: 0.04em;
+                "
+              >
+                FL
+              </div>
+              <span
+                class="text-[10px] font-bold bg-gold/10 border border-gold/25 text-gold px-2 py-1 rounded-full tracking-widest"
+                >FREE 🎯</span
+              >
+            </div>
+            <div class="font-bold text-base text-white mb-0.5">Fliff</div>
+            <div class="text-white/35 text-xs mb-4">
+              Free-to-play social sports
+            </div>
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="text-white/40">Raymond Win Rate</span
+                ><span class="font-bold text-green-400">86%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400"
+                  style="width: 86%"
+                ></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Total Wins
+                </div>
+                <div class="font-bebas text-xl text-gold">621</div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Members
+                </div>
+                <div class="font-bebas text-xl text-gold">780+</div>
+              </div>
+            </div>
+            <div
+              class="mt-4 w-full bg-white/5 border border-white/10 group-hover:bg-gold group-hover:border-gold group-hover:text-ink text-white/40 text-xs font-bold py-2 rounded-lg text-center transition-all"
+            >
+              Visit Fliff →
+            </div>
+          </div>
+
+          <!-- Caesars -->
+          <div
+            class="group bg-surface/70 border border-white/8 rounded-2xl p-5 hover:border-gold/40 hover:-translate-y-1 transition-all cursor-pointer"
+            onclick="openBook('https://caesars.com/sportsbook-and-casino')"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-extrabold"
+                style="
+                  background: linear-gradient(135deg, #1a1a2e, #16213e);
+                  color: #f0b429;
+                  font-family: &quot;Bebas Neue&quot;, cursive;
+                  letter-spacing: 0.04em;
+                "
+              >
+                CZR
+              </div>
+              <span
+                class="text-[10px] font-bold bg-white/5 border border-white/10 text-white/40 px-2 py-1 rounded-full tracking-widest"
+                >VEGAS</span
+              >
+            </div>
+            <div class="font-bold text-base text-white mb-0.5">Caesars</div>
+            <div class="text-white/35 text-xs mb-4">
+              Vegas royalty, massive bonus
+            </div>
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="text-white/40">Raymond Win Rate</span
+                ><span class="font-bold text-green-400">75%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400"
+                  style="width: 75%"
+                ></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Total Wins
+                </div>
+                <div class="font-bebas text-xl text-gold">689</div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Members
+                </div>
+                <div class="font-bebas text-xl text-gold">850+</div>
+              </div>
+            </div>
+            <div
+              class="mt-4 w-full bg-white/5 border border-white/10 group-hover:bg-gold group-hover:border-gold group-hover:text-ink text-white/40 text-xs font-bold py-2 rounded-lg text-center transition-all"
+            >
+              Visit Caesars →
+            </div>
+          </div>
+
+          <!-- PointsBet -->
+          <div
+            class="group bg-surface/70 border border-white/8 rounded-2xl p-5 hover:border-gold/40 hover:-translate-y-1 transition-all cursor-pointer"
+            onclick="openBook('https://pointsbet.com')"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-extrabold"
+                style="
+                  background: linear-gradient(135deg, #000, #1a1a1a);
+                  color: #e5e7eb;
+                  font-family: &quot;Bebas Neue&quot;, cursive;
+                  letter-spacing: 0.04em;
+                "
+              >
+                PB
+              </div>
+              <span
+                class="text-[10px] font-bold bg-white/5 border border-white/10 text-white/40 px-2 py-1 rounded-full tracking-widest"
+                >UNIQUE</span
+              >
+            </div>
+            <div class="font-bold text-base text-white mb-0.5">PointsBet</div>
+            <div class="text-white/35 text-xs mb-4">
+              PointsBetting — win big fast
+            </div>
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="text-white/40">Raymond Win Rate</span
+                ><span class="font-bold text-green-400">73%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400"
+                  style="width: 73%"
+                ></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Total Wins
+                </div>
+                <div class="font-bebas text-xl text-gold">512</div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Members
+                </div>
+                <div class="font-bebas text-xl text-gold">620+</div>
+              </div>
+            </div>
+            <div
+              class="mt-4 w-full bg-white/5 border border-white/10 group-hover:bg-gold group-hover:border-gold group-hover:text-ink text-white/40 text-xs font-bold py-2 rounded-lg text-center transition-all"
+            >
+              Visit PointsBet →
+            </div>
+          </div>
+
+          <!-- Hard Rock Bet -->
+          <div
+            class="group bg-surface/70 border border-white/8 rounded-2xl p-5 hover:border-gold/40 hover:-translate-y-1 transition-all cursor-pointer"
+            onclick="openBook('https://hardrock.bet')"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-extrabold"
+                style="
+                  background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+                  color: #fecaca;
+                  font-family: &quot;Bebas Neue&quot;, cursive;
+                  letter-spacing: 0.04em;
+                "
+              >
+                HR
+              </div>
+              <span
+                class="text-[10px] font-bold bg-white/5 border border-white/10 text-white/40 px-2 py-1 rounded-full tracking-widest"
+                >NEW</span
+              >
+            </div>
+            <div class="font-bold text-base text-white mb-0.5">
+              Hard Rock Bet
+            </div>
+            <div class="text-white/35 text-xs mb-4">
+              Iconic brand, sharp lines
+            </div>
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="text-white/40">Raymond Win Rate</span
+                ><span class="font-bold text-green-400">80%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400"
+                  style="width: 80%"
+                ></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Total Wins
+                </div>
+                <div class="font-bebas text-xl text-gold">445</div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Members
+                </div>
+                <div class="font-bebas text-xl text-gold">540+</div>
+              </div>
+            </div>
+            <div
+              class="mt-4 w-full bg-white/5 border border-white/10 group-hover:bg-gold group-hover:border-gold group-hover:text-ink text-white/40 text-xs font-bold py-2 rounded-lg text-center transition-all"
+            >
+              Visit Hard Rock →
+            </div>
+          </div>
+
+          <!-- ESPN Bet -->
+          <div
+            class="group bg-surface/70 border border-white/8 rounded-2xl p-5 hover:border-gold/40 hover:-translate-y-1 transition-all cursor-pointer"
+            onclick="openBook('https://espnbet.com')"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div
+                class="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-extrabold"
+                style="
+                  background: linear-gradient(135deg, #cc0000, #8b0000);
+                  color: #fff;
+                  font-family: &quot;Bebas Neue&quot;, cursive;
+                  letter-spacing: 0.04em;
+                "
+              >
+                ESPN
+              </div>
+              <span
+                class="text-[10px] font-bold bg-gold/10 border border-gold/25 text-gold px-2 py-1 rounded-full tracking-widest"
+                >HOT 🔥</span
+              >
+            </div>
+            <div class="font-bold text-base text-white mb-0.5">ESPN Bet</div>
+            <div class="text-white/35 text-xs mb-4">
+              Backed by the worldwide leader
+            </div>
+            <div class="mb-3">
+              <div class="flex justify-between text-xs mb-1.5">
+                <span class="text-white/40">Raymond Win Rate</span
+                ><span class="font-bold text-green-400">83%</span>
+              </div>
+              <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full bg-gradient-to-r from-green-500 to-green-400"
+                  style="width: 83%"
+                ></div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Total Wins
+                </div>
+                <div class="font-bebas text-xl text-gold">578</div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] text-white/25 uppercase tracking-wider">
+                  Members
+                </div>
+                <div class="font-bebas text-xl text-gold">700+</div>
+              </div>
+            </div>
+            <div
+              class="mt-4 w-full bg-white/5 border border-white/10 group-hover:bg-gold group-hover:border-gold group-hover:text-ink text-white/40 text-xs font-bold py-2 rounded-lg text-center transition-all"
+            >
+              Visit ESPN Bet →
+            </div>
+          </div>
+        </div>
+
+        <!-- Overall stat bar -->
+        <div
+          class="mt-10 bg-gradient-to-r from-gold/10 via-gold/5 to-transparent border border-gold/20 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4"
+        >
+          <div>
+            <div class="font-bebas text-2xl text-white">
+              RAYMOND'S OVERALL RECORD
+            </div>
+            <p class="text-white/35 text-sm">
+              Tracked across all platforms · 2024–2025 season
+            </p>
+          </div>
+          <div class="flex gap-6 flex-wrap">
+            <div class="text-center">
+              <div class="font-bebas text-3xl text-green-400 leading-none">
+                8,432
+              </div>
+              <div class="text-white/30 text-[10px] uppercase tracking-widest">
+                Wins
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="font-bebas text-3xl text-red-400 leading-none">
+                2,187
+              </div>
+              <div class="text-white/30 text-[10px] uppercase tracking-widest">
+                Losses
+              </div>
+            </div>
+            <div class="text-center">
+              <div class="font-bebas text-3xl text-gold leading-none">
+                79.4%
+              </div>
+              <div class="text-white/30 text-[10px] uppercase tracking-widest">
+                Win Rate
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── SPORTS NEWS ─── -->
+      <section id="sports-section" class="max-w-6xl mx-auto w-full px-4 py-16">
+        <div class="flex items-center gap-4 mb-6 flex-wrap">
+          <h2 class="font-bebas text-4xl text-white">SPORTS NEWS</h2>
+          <div
+            class="h-px flex-1 min-w-[30px] bg-gradient-to-r from-gold to-transparent"
+          ></div>
+        </div>
+
+        <!-- Sport buttons -->
+        <div
+          id="sport-btns"
+          class="flex gap-2 overflow-x-auto pb-3 mb-8 scrollbar-hide"
+        >
+          <button
+            class="sport-btn active-sport flex-shrink-0 px-4 py-2 rounded-full border border-gold bg-gold text-ink text-xs font-bold tracking-wide transition-all"
+            onclick="filterSport('all', this)"
+          >
+            ⚡ All
+          </button>
+          <button
+            class="sport-btn flex-shrink-0 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/50 text-xs font-bold tracking-wide hover:border-gold hover:text-gold transition-all"
+            onclick="filterSport('nhl', this)"
+          >
+            🏒 NHL
+          </button>
+          <button
+            class="sport-btn flex-shrink-0 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/50 text-xs font-bold tracking-wide hover:border-gold hover:text-gold transition-all"
+            onclick="filterSport('nba', this)"
+          >
+            🏀 NBA
+          </button>
+          <button
+            class="sport-btn flex-shrink-0 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/50 text-xs font-bold tracking-wide hover:border-gold hover:text-gold transition-all"
+            onclick="filterSport('nfl', this)"
+          >
+            🏈 NFL
+          </button>
+          <button
+            class="sport-btn flex-shrink-0 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/50 text-xs font-bold tracking-wide hover:border-gold hover:text-gold transition-all"
+            onclick="filterSport('mlb', this)"
+          >
+            ⚾ MLB
+          </button>
+          <button
+            class="sport-btn flex-shrink-0 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/50 text-xs font-bold tracking-wide hover:border-gold hover:text-gold transition-all"
+            onclick="filterSport('soccer', this)"
+          >
+            ⚽ Soccer
+          </button>
+          <button
+            class="sport-btn flex-shrink-0 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/50 text-xs font-bold tracking-wide hover:border-gold hover:text-gold transition-all"
+            onclick="filterSport('tennis', this)"
+          >
+            🎾 Tennis
+          </button>
+          <button
+            class="sport-btn flex-shrink-0 px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/50 text-xs font-bold tracking-wide hover:border-gold hover:text-gold transition-all"
+            onclick="filterSport('mma', this)"
+          >
+            🥊 MMA
+          </button>
+        </div>
+
+        <div
+          id="news-grid"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        ></div>
+      </section>
+
+      <!-- ─── SUBSCRIPTION PLANS ─── -->
+      <section
+        class="bg-surface/50 border-t border-b border-white/5 py-20 px-4"
+      >
+        <div class="max-w-5xl mx-auto">
+          <div class="text-center mb-12">
+            <span
+              class="bg-gold/10 border border-gold/30 text-gold text-xs font-bold tracking-[.12em] uppercase px-4 py-1.5 rounded-full"
+              >VIP MEMBERSHIP</span
+            >
+            <h2 class="font-bebas text-5xl mt-4 text-white">
+              CHOOSE YOUR PLAN
+            </h2>
+            <p class="text-white/40 mt-2 text-sm">
+              Join thousands of winners. Cancel monthly plans anytime.
+            </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Monthly -->
+            <div
+              class="bg-surface/80 border border-white/8 rounded-2xl p-6 hover:border-gold/50 transition-all cursor-pointer"
+              onclick="
+                showPage('signup');
+                setTimeout(() => selectPlan('monthly'), 80);
+              "
+            >
+              <div
+                class="text-[10px] font-bold text-white/40 tracking-[.12em] uppercase mb-1"
+              >
+                MONTHLY
+              </div>
+              <div class="font-bebas text-xl text-white mb-3">STARTER</div>
+              <div class="font-bebas text-5xl text-gold leading-none mb-1">
+                $150
+              </div>
+              <div class="text-white/30 text-xs mb-5">per month</div>
+              <div class="h-px bg-white/5 mb-5"></div>
+              <ul class="space-y-2.5 text-sm text-white/50 mb-6">
+                <li class="flex gap-2">
+                  <span class="text-green-400">✓</span> All daily picks
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-green-400">✓</span> VIP Telegram group
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-green-400">✓</span> Cancel anytime
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-white/20">–</span> Priority support
+                </li>
+              </ul>
+              <button
+                class="w-full bg-gradient-to-r from-gold to-gold-dark text-ink font-bold py-3 rounded-xl text-sm tracking-wide hover:opacity-90 transition-opacity"
+              >
+                Get Started
+              </button>
+            </div>
+
+            <!-- Yearly -->
+            <div
+              class="bg-surface/80 border-2 border-gold rounded-2xl p-6 relative shadow-[0_0_40px_rgba(240,180,41,.15)] cursor-pointer"
+              onclick="
+                showPage('signup');
+                setTimeout(() => selectPlan('yearly'), 80);
+              "
+            >
+              <div
+                class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gold text-ink text-[10px] font-extrabold px-4 py-1 rounded-full tracking-widest whitespace-nowrap"
+              >
+                MOST POPULAR
+              </div>
+              <div
+                class="text-[10px] font-bold text-gold tracking-[.12em] uppercase mb-1 mt-2"
+              >
+                YEARLY
+              </div>
+              <div class="font-bebas text-xl text-white mb-3">PRO</div>
+              <div class="font-bebas text-5xl text-gold leading-none mb-1">
+                $1,000
+              </div>
+              <div class="text-white/30 text-xs mb-1">per year</div>
+              <div class="text-green-400 text-xs font-bold mb-5">
+                Save $800 vs monthly
+              </div>
+              <div class="h-px bg-white/5 mb-5"></div>
+              <ul class="space-y-2.5 text-sm text-white/50 mb-6">
+                <li class="flex gap-2">
+                  <span class="text-green-400">✓</span> Everything in Starter
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-green-400">✓</span> Priority support
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-green-400">✓</span> Discord VIP channel
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-green-400">✓</span> Weekly video breakdown
+                </li>
+              </ul>
+              <button
+                class="w-full bg-gradient-to-r from-gold to-gold-dark text-ink font-bold py-3 rounded-xl text-sm tracking-wide hover:opacity-90 transition-opacity"
+              >
+                Get Started
+              </button>
+            </div>
+
+            <!-- Lifetime -->
+            <div
+              class="bg-surface/80 border border-white/8 rounded-2xl p-6 hover:border-gold/50 transition-all cursor-pointer"
+              onclick="
+                showPage('signup');
+                setTimeout(() => selectPlan('lifetime'), 80);
+              "
+            >
+              <div
+                class="text-[10px] font-bold text-white/40 tracking-[.12em] uppercase mb-1"
+              >
+                LIFETIME
+              </div>
+              <div class="font-bebas text-xl text-white mb-3">ELITE</div>
+              <div class="font-bebas text-5xl text-gold leading-none mb-1">
+                $1,500
+              </div>
+              <div class="text-white/30 text-xs mb-5">one-time, forever</div>
+              <div class="h-px bg-white/5 mb-5"></div>
+              <ul class="space-y-2.5 text-sm text-white/50 mb-6">
+                <li class="flex gap-2">
+                  <span class="text-green-400">✓</span> Everything in Pro
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-green-400">✓</span> Forever access
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-green-400">✓</span> 1-on-1 with Raymond
+                </li>
+                <li class="flex gap-2">
+                  <span class="text-green-400">✓</span> All future features
+                </li>
+              </ul>
+              <button
+                class="w-full bg-gradient-to-r from-gold to-gold-dark text-ink font-bold py-3 rounded-xl text-sm tracking-wide hover:opacity-90 transition-opacity"
+              >
+                Get Started
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── TESTIMONIALS ─── -->
+      <section class="max-w-6xl mx-auto w-full px-4 py-20">
+        <div class="text-center mb-12">
+          <h2 class="font-bebas text-5xl text-white">WHAT VIP MEMBERS SAY</h2>
+          <p class="text-white/40 text-sm mt-2">
+            Real people. Real wins. Real receipts.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Card template helper as inline HTML -->
+          <div
+            class="bg-surface/60 border border-white/8 rounded-2xl p-6 relative"
+          >
+            <div
+              class="absolute top-4 left-5 font-bebas text-6xl text-gold/15 leading-none select-none"
+            >
+              "
+            </div>
+            <div class="flex items-center gap-3 mb-4 mt-5">
+              <div
+                class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-extrabold text-sm text-white flex-shrink-0"
+              >
+                JW
+              </div>
+              <div>
+                <div class="font-bold text-sm">James W.</div>
+                <div class="text-white/30 text-xs">Houston, TX</div>
+              </div>
+              <div class="ml-auto text-gold text-xs">★★★★★</div>
+            </div>
+            <p class="text-white/50 text-sm leading-relaxed mb-4">
+              Raymond called the Chiefs ML before anyone else. I put $500 on it
+              and walked away with $2,400. The monthly plan paid for itself 16x
+              over in one weekend.
+            </p>
+            <div
+              class="bg-green-400/10 border border-green-400/20 rounded-lg px-3 py-2 text-green-400 text-xs font-bold"
+            >
+              💰 Won +$2,400 on FanDuel
+            </div>
+          </div>
+
+          <div
+            class="bg-surface/60 border border-white/8 rounded-2xl p-6 relative"
+          >
+            <div
+              class="absolute top-4 left-5 font-bebas text-6xl text-gold/15 leading-none select-none"
+            >
+              "
+            </div>
+            <div class="flex items-center gap-3 mb-4 mt-5">
+              <div
+                class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center font-extrabold text-sm text-white flex-shrink-0"
+              >
+                AD
+              </div>
+              <div>
+                <div class="font-bold text-sm">Aaliyah D.</div>
+                <div class="text-white/30 text-xs">Atlanta, GA</div>
+              </div>
+              <div class="ml-auto text-gold text-xs">★★★★★</div>
+            </div>
+            <p class="text-white/50 text-sm leading-relaxed mb-4">
+              I was skeptical at first but the NBA picks alone have been insane
+              this season. Celtics props, Lakers spreads — Raymond knows his
+              basketball. Lifetime plan was the best investment I've made.
+            </p>
+            <div
+              class="bg-green-400/10 border border-green-400/20 rounded-lg px-3 py-2 text-green-400 text-xs font-bold"
+            >
+              💰 Won +$4,200 on DraftKings
+            </div>
+          </div>
+
+          <div
+            class="bg-surface/60 border border-white/8 rounded-2xl p-6 relative"
+          >
+            <div
+              class="absolute top-4 left-5 font-bebas text-6xl text-gold/15 leading-none select-none"
+            >
+              "
+            </div>
+            <div class="flex items-center gap-3 mb-4 mt-5">
+              <div
+                class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-extrabold text-sm text-white flex-shrink-0"
+              >
+                MJ
+              </div>
+              <div>
+                <div class="font-bold text-sm">Marcus J.</div>
+                <div class="text-white/30 text-xs">Chicago, IL</div>
+              </div>
+              <div class="ml-auto text-gold text-xs">★★★★★</div>
+            </div>
+            <p class="text-white/50 text-sm leading-relaxed mb-4">
+              7 out of 8 picks hit last week. I've tried other services and
+              nothing comes close. The Telegram group is active 24/7 and Raymond
+              explains the reasoning behind every pick.
+            </p>
+            <div
+              class="bg-green-400/10 border border-green-400/20 rounded-lg px-3 py-2 text-green-400 text-xs font-bold"
+            >
+              💰 Won +$3,600 on BetMGM
+            </div>
+          </div>
+
+          <div
+            class="bg-surface/60 border border-white/8 rounded-2xl p-6 relative"
+          >
+            <div
+              class="absolute top-4 left-5 font-bebas text-6xl text-gold/15 leading-none select-none"
+            >
+              "
+            </div>
+            <div class="flex items-center gap-3 mb-4 mt-5">
+              <div
+                class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center font-extrabold text-sm text-white flex-shrink-0"
+              >
+                DT
+              </div>
+              <div>
+                <div class="font-bold text-sm">Darius T.</div>
+                <div class="text-white/30 text-xs">Miami, FL</div>
+              </div>
+              <div class="ml-auto text-gold text-xs">★★★★★</div>
+            </div>
+            <p class="text-white/50 text-sm leading-relaxed mb-4">
+              The yearly plan is a no-brainer if you're serious. Consistent
+              winner all season. Raymond is the real deal — transparent with
+              record, no cap no hype.
+            </p>
+            <div
+              class="bg-green-400/10 border border-green-400/20 rounded-lg px-3 py-2 text-green-400 text-xs font-bold"
+            >
+              💰 Won +$1,780 on Caesars
+            </div>
+          </div>
+
+          <div
+            class="bg-surface/60 border border-white/8 rounded-2xl p-6 relative"
+          >
+            <div
+              class="absolute top-4 left-5 font-bebas text-6xl text-gold/15 leading-none select-none"
+            >
+              "
+            </div>
+            <div class="flex items-center gap-3 mb-4 mt-5">
+              <div
+                class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center font-extrabold text-sm text-white flex-shrink-0"
+              >
+                KR
+              </div>
+              <div>
+                <div class="font-bold text-sm">Keisha R.</div>
+                <div class="text-white/30 text-xs">Detroit, MI</div>
+              </div>
+              <div class="ml-auto text-gold text-xs">★★★★★</div>
+            </div>
+            <p class="text-white/50 text-sm leading-relaxed mb-4">
+              My husband laughed when I signed up. He's not laughing anymore.
+              I've tripled my bankroll since October. RAYMOND PICKS is the only
+              service I'll ever use.
+            </p>
+            <div
+              class="bg-green-400/10 border border-green-400/20 rounded-lg px-3 py-2 text-green-400 text-xs font-bold"
+            >
+              💰 Won +$5,100 on FanDuel
+            </div>
+          </div>
+
+          <div
+            class="bg-surface/60 border border-white/8 rounded-2xl p-6 relative"
+          >
+            <div
+              class="absolute top-4 left-5 font-bebas text-6xl text-gold/15 leading-none select-none"
+            >
+              "
+            </div>
+            <div class="flex items-center gap-3 mb-4 mt-5">
+              <div
+                class="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-rose-700 flex items-center justify-center font-extrabold text-sm text-white flex-shrink-0"
+              >
+                CW
+              </div>
+              <div>
+                <div class="font-bold text-sm">Chris W.</div>
+                <div class="text-white/30 text-xs">Toronto, ON</div>
+              </div>
+              <div class="ml-auto text-gold text-xs">★★★★★</div>
+            </div>
+            <p class="text-white/50 text-sm leading-relaxed mb-4">
+              Best sports analyst I've found online. The NBA props are
+              next-level. Went 9-2 on his picks last month. Already recouped my
+              lifetime membership 4x over.
+            </p>
+            <div
+              class="bg-green-400/10 border border-green-400/20 rounded-lg px-3 py-2 text-green-400 text-xs font-bold"
+            >
+              💰 Won +$6,000 on DraftKings
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── FOOTER ─── -->
+      <footer class="bg-surface border-t border-white/5 px-4 pt-14 pb-8">
+        <div class="max-w-6xl mx-auto">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+            <div>
+              <div class="font-bebas text-3xl shimmer-text mb-3">
+                RAYMONDPICKS
+              </div>
+              <p class="text-white/35 text-sm leading-relaxed max-w-[200px]">
+                The most trusted VIP sports picks service. Verified results.
+                Real winners.
+              </p>
+              <div class="flex gap-2 mt-4">
+                <a
+                  href="#"
+                  class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-base hover:border-gold transition-colors"
+                  >📱</a
+                >
+                <a
+                  href="#"
+                  class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-base hover:border-gold transition-colors"
+                  >💬</a
+                >
+                <a
+                  href="#"
+                  class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-base hover:border-gold transition-colors"
+                  >🐦</a
+                >
+              </div>
+            </div>
+            <div>
+              <div
+                class="text-[10px] font-bold text-white/30 tracking-[.12em] uppercase mb-4"
+              >
+                Sports
+              </div>
+              <ul class="space-y-2.5">
+                <li>
+                  <button
+                    onclick="
+                      filterSport('nba', null);
+                      document
+                        .getElementById('sports-section')
+                        .scrollIntoView({ behavior: 'smooth' });
+                    "
+                    class="text-white/40 text-sm bg-transparent border-0 cursor-pointer hover:text-gold transition-colors"
+                  >
+                    🏀 NBA Picks
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onclick="
+                      filterSport('nhl', null);
+                      document
+                        .getElementById('sports-section')
+                        .scrollIntoView({ behavior: 'smooth' });
+                    "
+                    class="text-white/40 text-sm bg-transparent border-0 cursor-pointer hover:text-gold transition-colors"
+                  >
+                    🏒 NHL Picks
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onclick="
+                      filterSport('nfl', null);
+                      document
+                        .getElementById('sports-section')
+                        .scrollIntoView({ behavior: 'smooth' });
+                    "
+                    class="text-white/40 text-sm bg-transparent border-0 cursor-pointer hover:text-gold transition-colors"
+                  >
+                    🏈 NFL Picks
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onclick="
+                      filterSport('mlb', null);
+                      document
+                        .getElementById('sports-section')
+                        .scrollIntoView({ behavior: 'smooth' });
+                    "
+                    class="text-white/40 text-sm bg-transparent border-0 cursor-pointer hover:text-gold transition-colors"
+                  >
+                    ⚾ MLB Picks
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onclick="
+                      filterSport('soccer', null);
+                      document
+                        .getElementById('sports-section')
+                        .scrollIntoView({ behavior: 'smooth' });
+                    "
+                    class="text-white/40 text-sm bg-transparent border-0 cursor-pointer hover:text-gold transition-colors"
+                  >
+                    ⚽ Soccer Picks
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <div
+                class="text-[10px] font-bold text-white/30 tracking-[.12em] uppercase mb-4"
+              >
+                Membership
+              </div>
+              <ul class="space-y-2.5">
+                <li>
+                  <button
+                    onclick="showPage('signup')"
+                    class="text-white/40 text-sm bg-transparent border-0 cursor-pointer hover:text-gold transition-colors"
+                  >
+                    Monthly — $150/mo
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onclick="showPage('signup')"
+                    class="text-white/40 text-sm bg-transparent border-0 cursor-pointer hover:text-gold transition-colors"
+                  >
+                    Yearly — $1,000/yr
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onclick="showPage('signup')"
+                    class="text-white/40 text-sm bg-transparent border-0 cursor-pointer hover:text-gold transition-colors"
+                  >
+                    Lifetime — $1,500
+                  </button>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-white/40 text-sm hover:text-gold transition-colors"
+                    >Referral Program</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div>
+              <div
+                class="text-[10px] font-bold text-white/30 tracking-[.12em] uppercase mb-4"
+              >
+                Support
+              </div>
+              <ul class="space-y-2.5">
+                <li>
+                  <a
+                    href="#"
+                    class="text-white/40 text-sm hover:text-gold transition-colors"
+                    >Contact Us</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-white/40 text-sm hover:text-gold transition-colors"
+                    >FAQ</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-white/40 text-sm hover:text-gold transition-colors"
+                    >Terms of Service</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-white/40 text-sm hover:text-gold transition-colors"
+                    >Privacy Policy</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    class="text-white/40 text-sm hover:text-gold transition-colors"
+                    >Responsible Gambling</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div
+            class="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-center"
+          >
+            <p class="text-white/20 text-xs">
+              © 2025 RAYMONDPICKS. All rights reserved.
+            </p>
+            <p class="text-white/20 text-xs max-w-sm">
+              ⚠️ Must be 21+. Bet responsibly. Past picks do not guarantee
+              future results.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- SIGN IN -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-signin">
+      <div class="min-h-screen flex items-center justify-center px-4 py-16">
+        <div
+          class="w-full max-w-md bg-surface border border-white/8 rounded-2xl p-8 shadow-2xl"
+        >
+          <div class="text-center mb-8">
+            <div class="font-bebas text-4xl shimmer-text">RAYMONDPICKS</div>
+            <p class="text-white/40 text-sm mt-1">Welcome back, VIP</p>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label
+                class="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5"
+                >Email Address</label
+              >
+              <input
+                id="si-email"
+                type="email"
+                placeholder="you@email.com"
+                class="w-full bg-ink border border-white/8 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-gold transition-colors"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5"
+                >Password</label
+              >
+              <div class="relative">
+                <input
+                  id="si-pass"
+                  type="password"
+                  placeholder="••••••••"
+                  class="w-full bg-ink border border-white/8 rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder-white/20 focus:outline-none focus:border-gold transition-colors"
+                />
+                <button
+                  onclick="tPwd('si-pass', this)"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-0 text-white/30 cursor-pointer hover:text-white/60 text-base"
+                >
+                  👁
+                </button>
+              </div>
+            </div>
+            <div id="si-err" class="hidden text-red-400 text-xs"></div>
+            <button
+              onclick="doSignIn()"
+              class="w-full bg-gradient-to-r from-gold to-gold-dark text-ink font-bold py-3.5 rounded-xl tracking-wider hover:opacity-90 transition-opacity mt-2"
+            >
+              SIGN IN →
+            </button>
+          </div>
+          <div class="flex items-center gap-3 my-6">
+            <div class="flex-1 h-px bg-white/5"></div>
+            <span class="text-white/20 text-xs">or</span>
+            <div class="flex-1 h-px bg-white/5"></div>
+          </div>
+          <p class="text-center text-sm text-white/40">
+            No account?
+            <button
+              onclick="showPage('signup')"
+              class="text-gold font-bold bg-transparent border-0 cursor-pointer"
+            >
+              Sign Up Free
+            </button>
+          </p>
+          <button
+            onclick="showPage('landing')"
+            class="block mx-auto mt-4 text-white/25 text-xs bg-transparent border-0 cursor-pointer hover:text-white/50"
+          >
+            ← Back to home
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- SIGN UP -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-signup">
+      <div class="min-h-screen flex items-center justify-center px-4 py-16">
+        <div
+          class="w-full max-w-lg bg-surface border border-white/8 rounded-2xl p-8 shadow-2xl"
+        >
+          <div class="text-center mb-6">
+            <div class="font-bebas text-4xl shimmer-text">RAYMONDPICKS</div>
+            <p class="text-white/40 text-sm mt-1">Create your VIP account</p>
+          </div>
+          <!-- Tabs -->
+          <div class="flex bg-white/5 rounded-xl p-1 mb-7">
+            <button
+              id="s1-tab"
+              class="flex-1 py-2.5 rounded-lg text-xs font-bold bg-gold text-ink transition-all"
+            >
+              ① Account
+            </button>
+            <button
+              id="s2-tab"
+              class="flex-1 py-2.5 rounded-lg text-xs font-bold text-white/40 transition-all"
+            >
+              ② Choose Plan
+            </button>
+          </div>
+
+          <!-- Step 1 -->
+          <div id="su-step1">
+            <div class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    class="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5"
+                    >Full Name</label
+                  >
+                  <input
+                    id="su-name"
+                    type="text"
+                    placeholder="Raymond Johnson"
+                    class="w-full bg-ink border border-white/8 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-gold transition-colors"
+                  />
+                </div>
+                <div>
+                  <label
+                    class="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5"
+                    >Phone</label
+                  >
+                  <input
+                    id="su-phone"
+                    type="tel"
+                    placeholder="+1 555 000 0000"
+                    class="w-full bg-ink border border-white/8 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-gold transition-colors"
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  class="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5"
+                  >Country</label
+                >
+                <select
+                  id="su-country"
+                  class="w-full bg-ink border border-white/8 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors cursor-pointer"
+                >
+                  <option value="">Select your country</option>
+                  <option>United States</option>
+                  <option>Canada</option>
+                  <option>United Kingdom</option>
+                  <option>Australia</option>
+                  <option>Nigeria</option>
+                  <option>Ghana</option>
+                  <option>South Africa</option>
+                  <option>Jamaica</option>
+                  <option>Germany</option>
+                  <option>France</option>
+                  <option>Brazil</option>
+                  <option>Mexico</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  class="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5"
+                  >Email</label
+                >
+                <input
+                  id="su-email"
+                  type="email"
+                  placeholder="you@email.com"
+                  class="w-full bg-ink border border-white/8 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-gold transition-colors"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5"
+                  >Password</label
+                >
+                <div class="relative">
+                  <input
+                    id="su-pass"
+                    type="password"
+                    placeholder="Min 8 characters"
+                    oninput="chkStr()"
+                    class="w-full bg-ink border border-white/8 rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder-white/20 focus:outline-none focus:border-gold transition-colors"
+                  />
+                  <button
+                    onclick="tPwd('su-pass', this)"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-0 text-white/30 cursor-pointer text-base"
+                  >
+                    👁
+                  </button>
+                </div>
+                <div class="h-1 bg-white/5 rounded-full mt-2 overflow-hidden">
+                  <div
+                    id="str-bar"
+                    class="h-full rounded-full transition-all duration-300"
+                    style="width: 0%; background: #ef4444"
+                  ></div>
+                </div>
+                <div id="str-lbl" class="text-xs mt-1 text-white/30"></div>
+              </div>
+              <div>
+                <label
+                  class="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5"
+                  >Confirm Password</label
+                >
+                <div class="relative">
+                  <input
+                    id="su-conf"
+                    type="password"
+                    placeholder="Re-enter password"
+                    class="w-full bg-ink border border-white/8 rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder-white/20 focus:outline-none focus:border-gold transition-colors"
+                  />
+                  <button
+                    onclick="tPwd('su-conf', this)"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-0 text-white/30 cursor-pointer text-base"
+                  >
+                    👁
+                  </button>
+                </div>
+              </div>
+              <div id="su-err" class="hidden text-red-400 text-xs"></div>
+              <button
+                onclick="goStep2()"
+                class="w-full bg-gradient-to-r from-gold to-gold-dark text-ink font-bold py-3.5 rounded-xl tracking-wider hover:opacity-90 transition-opacity"
+              >
+                CONTINUE →
+              </button>
+            </div>
+            <button
+              onclick="showPage('landing')"
+              class="block mx-auto mt-4 text-white/25 text-xs bg-transparent border-0 cursor-pointer hover:text-white/50"
+            >
+              ← Back to home
+            </button>
+          </div>
+
+          <!-- Step 2 -->
+          <div id="su-step2" class="hidden">
+            <p
+              class="text-center text-[10px] font-bold text-white/30 uppercase tracking-widest mb-4"
+            >
+              Select Your VIP Plan
+            </p>
+            <div class="space-y-3" id="plan-cards">
+              <div
+                id="pc-monthly"
+                onclick="selectPlan('monthly')"
+                class="border border-white/8 rounded-xl p-4 cursor-pointer hover:border-gold/50 transition-all flex items-center gap-4"
+              >
+                <div
+                  id="pr-monthly"
+                  class="w-4 h-4 rounded-full border-2 border-white/30 flex-shrink-0 transition-all"
+                ></div>
+                <div class="flex-1">
+                  <div class="font-bold text-sm">Monthly Plan</div>
+                  <div class="text-white/35 text-xs">
+                    Cancel anytime · Full VIP access
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="font-bebas text-2xl text-gold leading-none">
+                    $150
+                  </div>
+                  <div class="text-white/30 text-xs">/mo</div>
+                </div>
+              </div>
+              <div
+                id="pc-yearly"
+                onclick="selectPlan('yearly')"
+                class="border-2 border-gold rounded-xl p-4 cursor-pointer plan-selected transition-all flex items-center gap-4 relative"
+              >
+                <div
+                  class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gold text-ink text-[9px] font-extrabold px-3 py-0.5 rounded-full tracking-widest whitespace-nowrap"
+                >
+                  BEST VALUE
+                </div>
+                <div
+                  id="pr-yearly"
+                  class="w-4 h-4 rounded-full border-2 border-gold bg-gold flex-shrink-0 transition-all mt-1"
+                ></div>
+                <div class="flex-1 mt-1">
+                  <div class="font-bold text-sm">Yearly Plan</div>
+                  <div class="text-green-400 text-xs font-semibold">
+                    Save $800 vs monthly
+                  </div>
+                </div>
+                <div class="text-right mt-1">
+                  <div class="font-bebas text-2xl text-gold leading-none">
+                    $1,000
+                  </div>
+                  <div class="text-white/30 text-xs">/yr</div>
+                </div>
+              </div>
+              <div
+                id="pc-lifetime"
+                onclick="selectPlan('lifetime')"
+                class="border border-white/8 rounded-xl p-4 cursor-pointer hover:border-gold/50 transition-all flex items-center gap-4"
+              >
+                <div
+                  id="pr-lifetime"
+                  class="w-4 h-4 rounded-full border-2 border-white/30 flex-shrink-0 transition-all"
+                ></div>
+                <div class="flex-1">
+                  <div class="font-bold text-sm">Lifetime Plan</div>
+                  <div class="text-white/35 text-xs">
+                    One-time · Forever access
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="font-bebas text-2xl text-gold leading-none">
+                    $1,500
+                  </div>
+                  <div class="text-white/30 text-xs">once</div>
+                </div>
+              </div>
+            </div>
+            <div id="p-err" class="hidden text-red-400 text-xs mt-2"></div>
+            <button
+              onclick="doSignUp()"
+              class="w-full bg-gradient-to-r from-gold to-gold-dark text-ink font-bold py-3.5 rounded-xl tracking-wider hover:opacity-90 transition-opacity mt-5"
+            >
+              CREATE ACCOUNT 🔥
+            </button>
+            <button
+              onclick="backStep1()"
+              class="block mx-auto mt-3 text-white/25 text-xs bg-transparent border-0 cursor-pointer hover:text-white/50"
+            >
+              ← Back
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- DASHBOARD -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-dashboard">
+      <div class="min-h-screen px-4 py-8">
+        <div class="max-w-4xl mx-auto space-y-5">
+          <!-- Header -->
+          <div class="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <div
+                class="text-white/30 text-xs font-bold uppercase tracking-widest"
+              >
+                VIP Dashboard
+              </div>
+              <h2 id="dash-name" class="font-bebas text-4xl text-white mt-0.5">
+                Welcome, Champion 🏆
+              </h2>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span
+                id="dash-badge"
+                class="bg-gold/10 border border-gold/30 text-gold text-xs font-bold px-3 py-1 rounded-full tracking-widest"
+                >MONTHLY VIP</span
+              >
+              <button
+                onclick="goHome()"
+                class="flex items-center gap-1.5 border border-white/15 text-white/60 px-4 py-2 rounded-lg text-sm font-semibold hover:border-gold hover:text-gold transition-all"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M3 12l2-2m0 0l7-7 7 7m-9 9V11m0 0H6m3 0h3"
+                  />
+                </svg>
+                Home
+              </button>
+              <button
+                onclick="doSignOut()"
+                class="border border-white/15 text-white/50 px-4 py-2 rounded-lg text-sm font-semibold hover:border-red-500 hover:text-red-400 transition-all"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats row -->
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div
+              class="bg-surface border border-white/8 rounded-2xl p-5 text-center"
+            >
+              <div class="font-bebas text-3xl text-green-400 leading-none">
+                $0.00
+              </div>
+              <div
+                class="text-white/30 text-[10px] uppercase tracking-widest mt-2"
+              >
+                Available Balance
+              </div>
+            </div>
+            <div
+              class="bg-surface border border-white/8 rounded-2xl p-5 text-center"
+            >
+              <div
+                class="font-bebas text-3xl text-gold leading-none"
+                id="dash-deposited"
+              >
+                $0.00
+              </div>
+              <div
+                class="text-white/30 text-[10px] uppercase tracking-widest mt-2"
+              >
+                Total Deposited
+              </div>
+            </div>
+            <!-- Withdraw -->
+            <div
+              onclick="openWithdrawModal()"
+              class="bg-surface border border-white/8 rounded-2xl p-5 text-center cursor-pointer hover:border-gold/50 transition-all group"
+            >
+              <div
+                class="text-2xl mb-1 group-hover:scale-110 transition-transform"
+              >
+                💸
+              </div>
+              <div class="text-gold text-sm font-bold">Withdraw</div>
+              <div class="text-white/25 text-[10px] mt-0.5">Tap to request</div>
+            </div>
+          </div>
+
+          <!-- Subscribe Button -->
+          <div
+            class="bg-gradient-to-r from-gold/10 to-gold-dark/5 border border-gold/25 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4"
+          >
+            <div>
+              <div class="font-bebas text-xl text-white">
+                SUBSCRIBE TO VIP PICKS
+              </div>
+              <p class="text-white/40 text-sm">
+                Get instant access to all daily picks and the private group.
+              </p>
+            </div>
+            <button
+              onclick="
+                document.getElementById('pay-modal').classList.remove('hidden')
+              "
+              class="flex-shrink-0 bg-gradient-to-r from-gold to-gold-dark text-ink font-bold px-8 py-3 rounded-xl tracking-wider hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[0_6px_24px_rgba(240,180,41,.3)] whitespace-nowrap"
+            >
+              🔥 SUBSCRIBE NOW
+            </button>
+          </div>
+
+          <!-- Subscription plan switcher -->
+          <div class="bg-surface border border-white/8 rounded-2xl p-5">
+            <div
+              class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-4"
+            >
+              Your Subscription Plan
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div
+                id="dp-monthly"
+                onclick="switchDashPlan('monthly')"
+                class="border border-gold rounded-xl p-4 cursor-pointer plan-selected transition-all"
+              >
+                <div class="flex justify-between items-center">
+                  <div>
+                    <div
+                      class="text-[10px] font-bold text-white/40 uppercase tracking-widest"
+                    >
+                      MONTHLY
+                    </div>
+                    <div class="font-bebas text-xl text-gold">$150/mo</div>
+                  </div>
+                  <div
+                    id="dr-monthly"
+                    class="w-4 h-4 rounded-full bg-gold border-2 border-gold"
+                  ></div>
+                </div>
+                <div class="text-white/25 text-xs mt-1.5">Active plan</div>
+              </div>
+              <div
+                id="dp-yearly"
+                onclick="switchDashPlan('yearly')"
+                class="border border-white/8 rounded-xl p-4 cursor-pointer hover:border-gold/50 transition-all"
+              >
+                <div class="flex justify-between items-center">
+                  <div>
+                    <div
+                      class="text-[10px] font-bold text-green-400/70 uppercase tracking-widest"
+                    >
+                      YEARLY ★
+                    </div>
+                    <div class="font-bebas text-xl text-gold">$1,000/yr</div>
+                  </div>
+                  <div
+                    id="dr-yearly"
+                    class="w-4 h-4 rounded-full border-2 border-white/30"
+                  ></div>
+                </div>
+                <div class="text-white/25 text-xs mt-1.5">
+                  Save $800 — switch now
+                </div>
+              </div>
+              <div
+                id="dp-lifetime"
+                onclick="switchDashPlan('lifetime')"
+                class="border border-white/8 rounded-xl p-4 cursor-pointer hover:border-gold/50 transition-all"
+              >
+                <div class="flex justify-between items-center">
+                  <div>
+                    <div
+                      class="text-[10px] font-bold text-white/40 uppercase tracking-widest"
+                    >
+                      LIFETIME
+                    </div>
+                    <div class="font-bebas text-xl text-gold">$1,500</div>
+                  </div>
+                  <div
+                    id="dr-lifetime"
+                    class="w-4 h-4 rounded-full border-2 border-white/30"
+                  ></div>
+                </div>
+                <div class="text-white/25 text-xs mt-1.5">One-time forever</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- PAYMENT MODAL — 2-step -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <div
+      id="pay-modal"
+      class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
+    >
+      <div
+        class="bg-surface border border-white/10 rounded-2xl w-full max-w-md shadow-2xl relative my-auto"
+      >
+        <!-- Close -->
+        <button
+          onclick="closePayModal()"
+          class="absolute top-4 right-4 text-white/30 hover:text-white bg-transparent border-0 text-xl cursor-pointer z-10"
+        >
+          ✕
+        </button>
+
+        <!-- ── STEP 1: Choose Method ── -->
+        <div id="pay-step1" class="p-7">
+          <div class="text-center mb-5">
+            <div class="font-bebas text-2xl text-white">CHOOSE PAYMENT</div>
+            <p class="text-white/35 text-xs mt-1">
+              Select how you'd like to pay
+            </p>
+          </div>
+
+          <!-- Plan pill -->
+          <div
+            class="bg-gold/10 border border-gold/25 rounded-xl p-3 mb-5 text-center"
+          >
+            <div class="text-white/40 text-[10px] uppercase tracking-widest">
+              Selected Plan
+            </div>
+            <div
+              class="font-bebas text-xl text-gold mt-0.5"
+              id="pay-plan-label"
+            >
+              Monthly — $150/mo
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <button
+              onclick="selectPayment('chime')"
+              id="pm-chime"
+              class="pay-method w-full flex items-center gap-4 p-4 border border-white/8 rounded-xl hover:border-[#06c167]/60 transition-all cursor-pointer bg-transparent text-left group"
+            >
+              <div
+                class="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                style="
+                  background: rgba(6, 193, 103, 0.15);
+                  border: 1px solid rgba(6, 193, 103, 0.3);
+                "
+              >
+                💚
+              </div>
+              <div class="flex-1"
+                class="font-bold text-white text-sm" 
+                  >Chime Tag</div
+                >
+              
+                <div class="text-white/35 text-xs">Instant bank transfer</div>
+              </div>
+              <svg
+                class="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+
+            <button
+              onclick="selectPayment('zelle')"
+              id="pm-zelle"
+              class="pay-method w-full flex items-center gap-4 p-4 border border-white/8 rounded-xl hover:border-violet-500/60 transition-all cursor-pointer bg-transparent text-left group"
+            >
+              <div
+                class="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                style="
+                  background: rgba(139, 92, 246, 0.15);
+                  border: 1px solid rgba(139, 92, 246, 0.3);
+                "
+              >
+                💜
+              </div>
+              <div class="flex-1">
+        <div class="font-bold text-white text-sm" 
+                  >zelle</div
+                >
+                
+                <div class="text-white/35 text-xs">Direct bank-to-bank</div>
+              </div>
+              <svg
+                class="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+
+            <button
+              onclick="selectPayment('applepay')"
+              id="pm-applepay"
+              class="pay-method w-full flex items-center gap-4 p-4 border border-white/8 rounded-xl hover:border-white/30 transition-all cursor-pointer bg-transparent text-left group"
+            >
+              <div
+                class="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                style="
+                  background: rgba(255, 255, 255, 0.08);
+                  border: 1px solid rgba(255, 255, 255, 0.15);
+                "
+              >
+                🍎
+              </div>
+              <div class="flex-1">
+                <div class="font-bold text-white text-sm" data-apple-id
+                  >raymondpicks@icloud.com</div
+                >
+                
+                <div class="text-white/35 text-xs">One-tap secure payment</div>
+              </div>
+              <svg
+                class="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+
+            <button
+              onclick="selectPayment('bitcoin')"
+              id="pm-bitcoin"
+              class="pay-method w-full flex items-center gap-4 p-4 border border-white/8 rounded-xl hover:border-orange-400/60 transition-all cursor-pointer bg-transparent text-left group"
+            >
+              <div
+                class="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                style="
+                  background: rgba(251, 146, 60, 0.15);
+                  border: 1px solid rgba(251, 146, 60, 0.3);
+                "
+              >
+                ₿
+              </div>
+              <div class="flex-1">
+                <div
+                  class="font-mono text-[11px] text-orange-300"
+                  
+                >
+                
+                <div class="text-white/35 text-xs">
+                  Crypto — fast &amp; anonymous
+                </div>
+              </div>
+              <svg
+                class="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div
+            id="pay-err"
+            class="hidden text-red-400 text-xs mt-3 text-center"
+          ></div>
+        </div>
+
+        <!-- ── STEP 2: Payment Details ── -->
+        <div id="pay-step2" class="hidden p-7">
+          <!-- Back -->
+          <button
+            onclick="backToPayStep1()"
+            class="flex items-center gap-1.5 text-white/35 text-xs mb-5 bg-transparent border-0 cursor-pointer hover:text-white/60 transition-colors"
+          >
+            <svg
+              class="w-3.5 h-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Back to methods
+          </button>
+
+          <!-- Method header -->
+          <div id="pay-method-header" class="flex items-center gap-3 mb-6">
+            <div
+              id="pay-method-icon"
+              class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
+            ></div>
+            <div>
+              <div
+                id="pay-method-name"
+                class="font-bebas text-xl text-white"
+              ></div>
+              <div
+                class="font-bebas text-sm text-gold"
+                id="pay-method-plan"
+              ></div>
+            </div>
+          </div>
+
+          <!-- ─ CHIME details ─ -->
+          <div id="details-chime" class="hidden">
+            <div
+              class="bg-[#06c167]/8 border border-[#06c167]/25 rounded-2xl p-5 mb-5"
+            >
+              <div
+                class="text-[10px] font-bold text-[#06c167]/70 uppercase tracking-widest mb-3"
+              >
+                Send Payment To
+              </div>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-white/40 text-sm">Chime $Tag</span>
+                  <button
+                    onclick="copyText('$RaymondPicks')"
+                    class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 hover:border-[#06c167]/50 transition-colors group"
+                  >
+                    <span class="font-bold text-white text-sm"
+                      >$RaymondPicks</span
+                    >
+                    <svg
+                      class="w-3.5 h-3.5 text-white/30 group-hover:text-[#06c167] transition-colors"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <rect x="9" y="9" width="13" height="13" rx="2" />
+                      <path
+                        d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-white/40 text-sm">Phone</span>
+                  <button
+                    onclick="copyText('(305) 555-0142')"
+                    class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 hover:border-[#06c167]/50 transition-colors group"
+                  >
+                    <span class="font-bold text-white text-sm"
+                      >(305) 555-0142</span
+                    >
+                    <svg
+                      class="w-3.5 h-3.5 text-white/30 group-hover:text-[#06c167] transition-colors"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <rect x="9" y="9" width="13" height="13" rx="2" />
+                      <path
+                        d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div
+              class="bg-white/3 border border-white/6 rounded-xl p-4 mb-5 text-xs text-white/40 leading-relaxed space-y-1.5"
+            >
+              <p>
+                ① Open Chime app →
+                <strong class="text-white/60">Pay Anyone</strong>
+              </p>
+              <p>
+                ② Search <strong class="text-white/60">$RaymondPicks</strong> or
+                enter the phone number
+              </p>
+              <p>
+                ③ Enter your plan amount and tap
+                <strong class="text-white/60">Send</strong>
+              </p>
+              <p>④ Screenshot your confirmation and DM us on Telegram</p>
+            </div>
+          </div>
+
+          <!-- ─ ZELLE details ─ -->
+          <div id="details-zelle" class="hidden">
+            <div
+              class="bg-violet-500/8 border border-violet-500/25 rounded-2xl p-5 mb-5"
+            >
+              <div
+                class="text-[10px] font-bold text-violet-400/70 uppercase tracking-widest mb-3"
+              >
+                Send Payment To
+              </div>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-white/40 text-sm">Email</span>
+                  <button
+                    onclick="copyText('pay@raymondpicks.com')"
+                    class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 hover:border-violet-500/50 transition-colors group"
+                  >
+                    <span class="font-bold text-white text-sm"
+                      >pay@raymondpicks.com</span
+                    >
+                    <svg
+                      class="w-3.5 h-3.5 text-white/30 group-hover:text-violet-400 transition-colors"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <rect x="9" y="9" width="13" height="13" rx="2" />
+                      <path
+                        d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-white/40 text-sm">Phone</span>
+                  <button
+                    onclick="copyText('(305) 555-0142')"
+                    class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 hover:border-violet-500/50 transition-colors group"
+                  >
+                    <span class="font-bold text-white text-sm"
+                      >(305) 555-0142</span
+                    >
+                    <svg
+                      class="w-3.5 h-3.5 text-white/30 group-hover:text-violet-400 transition-colors"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <rect x="9" y="9" width="13" height="13" rx="2" />
+                      <path
+                        d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div
+              class="bg-white/3 border border-white/6 rounded-xl p-4 mb-5 text-xs text-white/40 leading-relaxed space-y-1.5"
+            >
+              <p>
+                ① Open your bank app → find
+                <strong class="text-white/60">Zelle</strong>
+              </p>
+              <p>
+                ② Send to
+                <strong class="text-white/60">pay@raymondpicks.com</strong>
+              </p>
+              <p>③ Add your plan in the memo field (e.g. "Monthly VIP")</p>
+              <p>④ Screenshot your confirmation and send to us on Telegram</p>
+            </div>
+          </div>
+
+          <!-- ─ APPLE PAY details ─ -->
+          <div id="details-applepay" class="hidden">
+            <div class="bg-white/5 border border-white/15 rounded-2xl p-5 mb-5">
+              <div
+                class="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3"
+              >
+                Apple Cash / Apple Pay
+              </div>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <span class="text-white/40 text-sm">Apple ID</span>
+                  <button
+                    onclick="copyText('raymondpicks@icloud.com')"
+                    class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 hover:border-white/30 transition-colors group"
+                  >
+                    <span class="font-bold text-white text-sm"
+                      >raymondpicks@icloud.com</span
+                    >
+                    <svg
+                      class="w-3.5 h-3.5 text-white/30 group-hover:text-white/60 transition-colors"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <rect x="9" y="9" width="13" height="13" rx="2" />
+                      <path
+                        d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div
+              class="bg-white/3 border border-white/6 rounded-xl p-4 mb-5 text-xs text-white/40 leading-relaxed space-y-1.5"
+            >
+              <p>
+                ① Open <strong class="text-white/60">Messages</strong> on iPhone
+                → tap the <strong class="text-white/60">+</strong> → Apple Cash
+              </p>
+              <p>
+                ② Or go to
+                <strong class="text-white/60">Wallet → Send Money</strong>
+              </p>
+              <p>
+                ③ Search
+                <strong class="text-white/60">raymondpicks@icloud.com</strong>
+              </p>
+              <p>④ Enter plan amount and confirm with Face ID / Touch ID</p>
+              <p>⑤ DM us your confirmation screenshot on Telegram</p>
+            </div>
+          </div>
+
+          <!-- ─ BITCOIN details ─ -->
+          <div id="details-bitcoin" class="hidden">
+            <div
+              class="bg-orange-400/8 border border-orange-400/25 rounded-2xl p-5 mb-5"
+            >
+              <div
+                class="text-[10px] font-bold text-orange-400/70 uppercase tracking-widest mb-3"
+              >
+                Bitcoin Wallet Address
+              </div>
+              <!-- Fake QR code visual -->
+              <div class="flex flex-col items-center mb-4">
+                <div
+                  class="bg-white rounded-xl p-3 mb-3"
+                  style="width: fit-content"
+                >
+                  <svg
+                    viewBox="0 0 21 21"
+                    width="120"
+                    height="120"
+                    xmlns="http://www.w3.org/2000/svg"
+                    shape-rendering="crispEdges"
+                  >
+                    <!-- QR code pattern (decorative) -->
+                    <rect width="21" height="21" fill="white" />
+                    <!-- Finder patterns -->
+                    <rect x="0" y="0" width="7" height="7" fill="black" />
+                    <rect x="1" y="1" width="5" height="5" fill="white" />
+                    <rect x="2" y="2" width="3" height="3" fill="black" />
+                    <rect x="14" y="0" width="7" height="7" fill="black" />
+                    <rect x="15" y="1" width="5" height="5" fill="white" />
+                    <rect x="16" y="2" width="3" height="3" fill="black" />
+                    <rect x="0" y="14" width="7" height="7" fill="black" />
+                    <rect x="1" y="15" width="5" height="5" fill="white" />
+                    <rect x="2" y="16" width="3" height="3" fill="black" />
+                    <!-- Data dots -->
+                    <rect x="8" y="0" width="1" height="1" fill="black" />
+                    <rect x="10" y="0" width="1" height="1" fill="black" />
+                    <rect x="12" y="0" width="1" height="1" fill="black" />
+                    <rect x="7" y="2" width="1" height="1" fill="black" />
+                    <rect x="9" y="2" width="1" height="1" fill="black" />
+                    <rect x="11" y="2" width="1" height="1" fill="black" />
+                    <rect x="8" y="4" width="1" height="1" fill="black" />
+                    <rect x="10" y="4" width="2" height="1" fill="black" />
+                    <rect x="13" y="4" width="1" height="1" fill="black" />
+                    <rect x="7" y="6" width="2" height="1" fill="black" />
+                    <rect x="11" y="6" width="1" height="1" fill="black" />
+                    <rect x="7" y="8" width="1" height="1" fill="black" />
+                    <rect x="9" y="8" width="3" height="1" fill="black" />
+                    <rect x="14" y="8" width="2" height="1" fill="black" />
+                    <rect x="17" y="8" width="2" height="1" fill="black" />
+                    <rect x="8" y="9" width="1" height="1" fill="black" />
+                    <rect x="11" y="9" width="1" height="1" fill="black" />
+                    <rect x="13" y="9" width="1" height="1" fill="black" />
+                    <rect x="16" y="9" width="1" height="1" fill="black" />
+                    <rect x="7" y="10" width="2" height="1" fill="black" />
+                    <rect x="10" y="10" width="2" height="1" fill="black" />
+                    <rect x="14" y="10" width="1" height="1" fill="black" />
+                    <rect x="17" y="10" width="1" height="1" fill="black" />
+                    <rect x="9" y="11" width="1" height="1" fill="black" />
+                    <rect x="12" y="11" width="2" height="1" fill="black" />
+                    <rect x="16" y="11" width="2" height="1" fill="black" />
+                    <rect x="8" y="12" width="1" height="1" fill="black" />
+                    <rect x="11" y="12" width="1" height="1" fill="black" />
+                    <rect x="13" y="12" width="2" height="1" fill="black" />
+                    <rect x="7" y="13" width="1" height="1" fill="black" />
+                    <rect x="10" y="13" width="1" height="1" fill="black" />
+                    <rect x="12" y="13" width="1" height="1" fill="black" />
+                    <rect x="15" y="13" width="3" height="1" fill="black" />
+                    <rect x="8" y="14" width="2" height="1" fill="black" />
+                    <rect x="14" y="14" width="1" height="1" fill="black" />
+                    <rect x="17" y="14" width="1" height="1" fill="black" />
+                    <rect x="9" y="15" width="1" height="1" fill="black" />
+                    <rect x="11" y="15" width="1" height="1" fill="black" />
+                    <rect x="13" y="15" width="1" height="1" fill="black" />
+                    <rect x="16" y="15" width="2" height="1" fill="black" />
+                    <rect x="8" y="16" width="1" height="1" fill="black" />
+                    <rect x="12" y="16" width="1" height="1" fill="black" />
+                    <rect x="14" y="16" width="1" height="1" fill="black" />
+                    <rect x="9" y="17" width="2" height="1" fill="black" />
+                    <rect x="13" y="17" width="2" height="1" fill="black" />
+                    <rect x="17" y="17" width="1" height="1" fill="black" />
+                    <rect x="7" y="18" width="1" height="1" fill="black" />
+                    <rect x="10" y="18" width="1" height="1" fill="black" />
+                    <rect x="12" y="18" width="1" height="1" fill="black" />
+                    <rect x="15" y="18" width="1" height="1" fill="black" />
+                    <rect x="8" y="19" width="1" height="1" fill="black" />
+                    <rect x="11" y="19" width="2" height="1" fill="black" />
+                    <rect x="14" y="19" width="2" height="1" fill="black" />
+                    <rect x="9" y="20" width="1" height="1" fill="black" />
+                    <rect x="12" y="20" width="1" height="1" fill="black" />
+                    <rect x="16" y="20" width="2" height="1" fill="black" />
+                  </svg>
+                </div>
+                <div class="text-white/25 text-[10px]">Scan to send BTC</div>
+              </div>
+              <div class="flex items-center gap-2">
+                <div
+                  class="flex-1 bg-black/40 rounded-lg px-3 py-2 font-mono text-[11px] text-orange-300 break-all leading-relaxed"
+                >
+                  bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
+                </div>
+                <button
+                  onclick="
+                    copyText('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh')
+                  "
+                  class="flex-shrink-0 w-9 h-9 bg-orange-400/15 border border-orange-400/30 rounded-lg flex items-center justify-center hover:bg-orange-400/25 transition-colors"
+                >
+                  <svg
+                    class="w-4 h-4 text-orange-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect x="9" y="9" width="13" height="13" rx="2" />
+                    <path
+                      d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div
+              class="bg-white/3 border border-white/6 rounded-xl p-4 mb-5 text-xs text-white/40 leading-relaxed space-y-1.5"
+            >
+              <p>
+                ① Open your Bitcoin wallet (Coinbase, Exodus, Trust Wallet,
+                etc.)
+              </p>
+              <p>
+                ② Tap <strong class="text-white/60">Send</strong> and paste or
+                scan the address above
+              </p>
+              <p>③ Enter the USD equivalent of your plan amount</p>
+              <p>
+                ④ Send the transaction and copy the
+                <strong class="text-white/60">TXID</strong>
+              </p>
+              <p>⑤ DM us your TXID on Telegram to activate VIP instantly</p>
+            </div>
+          </div>
+
+          <!-- Confirm CTA -->
+          <button
+            onclick="confirmPayment()"
+            class="w-full bg-gradient-to-r from-gold to-gold-dark text-ink font-bold py-3.5 rounded-xl tracking-wider hover:opacity-90 transition-opacity"
+          >
+            I'VE SENT PAYMENT ✓
+          </button>
+          <p class="text-center text-white/25 text-[10px] mt-3">
+            VIP access activated within 30 minutes of payment confirmation
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- WITHDRAW MODAL -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <div
+      id="w-modal"
+      class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+    >
+      <div
+        class="bg-surface border border-white/10 rounded-2xl w-full max-w-sm shadow-2xl relative overflow-hidden"
+      >
+        <!-- ── STEP 1: Details ── -->
+        <div id="w-step1" class="p-7">
+          <button
+            onclick="closeWithdrawModal()"
+            class="absolute top-4 right-4 text-white/30 hover:text-white bg-transparent border-0 text-xl cursor-pointer"
+          >
+            ✕
+          </button>
+          <div class="font-bebas text-2xl text-white mb-1">WITHDRAW FUNDS</div>
+          <p class="text-white/35 text-sm mb-5">
+            Available: <span class="text-green-400 font-bold">$0.00</span>
+          </p>
+          <div class="space-y-4">
+            <div>
+              <label
+                class="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5"
+                >Amount ($)</label
+              >
+              <input
+                id="w-amount"
+                type="number"
+                placeholder="0.00"
+                min="0"
+                class="w-full bg-ink border border-white/8 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-gold transition-colors"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5"
+                >Method</label
+              >
+              <select
+                id="w-method"
+                class="w-full bg-ink border border-white/8 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-gold transition-colors cursor-pointer"
+              >
+                <option>Bank Transfer (ACH)</option>
+                <option>PayPal</option>
+                <option>Venmo</option>
+                <option>CashApp</option>
+                <option>Zelle</option>
+              </select>
+            </div>
+            <div>
+              <label
+                class="block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5"
+                >Account / Handle</label
+              >
+              <input
+                id="w-account"
+                type="text"
+                placeholder="$username or account number"
+                class="w-full bg-ink border border-white/8 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-gold transition-colors"
+              />
+            </div>
+            <div id="w-step1-err" class="hidden text-red-400 text-xs"></div>
+            <button
+              onclick="submitWithdrawDetails()"
+              class="w-full bg-gradient-to-r from-gold to-gold-dark text-ink font-bold py-3.5 rounded-xl tracking-wider hover:opacity-90 transition-opacity"
+            >
+              REQUEST WITHDRAWAL →
+            </button>
+          </div>
+        </div>
+
+        <!-- ── STEP 2: PIN Verification ── -->
+        <div id="w-step2" class="hidden p-7">
+          <button
+            onclick="backWithdrawStep1()"
+            class="flex items-center gap-1.5 text-white/35 text-xs mb-5 bg-transparent border-0 cursor-pointer hover:text-white/60 transition-colors"
+          >
+            <svg
+              class="w-3.5 h-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Back
+          </button>
+
+          <!-- Lock icon -->
+          <div class="flex flex-col items-center mb-6">
+            <div
+              class="w-16 h-16 rounded-2xl bg-gold/10 border border-gold/25 flex items-center justify-center mb-3"
+            >
+              <svg
+                class="w-8 h-8 text-gold"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="1.8"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+            </div>
+            <div class="font-bebas text-xl text-white">VERIFY WITHDRAWAL</div>
+            <p class="text-white/35 text-xs text-center mt-1 max-w-[200px]">
+              Enter your 5-digit security code to process this withdrawal
+            </p>
+          </div>
+
+          <!-- Summary pill -->
+          <div
+            id="w-summary"
+            class="bg-white/4 border border-white/8 rounded-xl px-4 py-3 mb-5 flex items-center justify-between"
+          >
+            <div class="text-white/40 text-xs">
+              Withdrawal to
+              <span
+                id="w-summary-method"
+                class="text-white/60 font-semibold"
+              ></span>
+            </div>
+            <div class="font-bebas text-lg text-gold" id="w-summary-amount">
+              $0.00
+            </div>
+          </div>
+
+          <!-- 5-digit PIN input boxes -->
+          <div class="flex gap-2.5 justify-center mb-4" id="pin-boxes">
+            <input
+              type="text"
+              maxlength="1"
+              inputmode="numeric"
+              pattern="[0-9]"
+              class="w-12 h-14 bg-ink border-2 border-white/10 rounded-xl text-center text-2xl font-bold text-white focus:outline-none focus:border-gold transition-colors"
+              oninput="pinInput(this, 0)"
+              onkeydown="pinBack(event, this, 0)"
+              id="pin0"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              inputmode="numeric"
+              pattern="[0-9]"
+              class="w-12 h-14 bg-ink border-2 border-white/10 rounded-xl text-center text-2xl font-bold text-white focus:outline-none focus:border-gold transition-colors"
+              oninput="pinInput(this, 1)"
+              onkeydown="pinBack(event, this, 1)"
+              id="pin1"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              inputmode="numeric"
+              pattern="[0-9]"
+              class="w-12 h-14 bg-ink border-2 border-white/10 rounded-xl text-center text-2xl font-bold text-white focus:outline-none focus:border-gold transition-colors"
+              oninput="pinInput(this, 2)"
+              onkeydown="pinBack(event, this, 2)"
+              id="pin2"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              inputmode="numeric"
+              pattern="[0-9]"
+              class="w-12 h-14 bg-ink border-2 border-white/10 rounded-xl text-center text-2xl font-bold text-white focus:outline-none focus:border-gold transition-colors"
+              oninput="pinInput(this, 3)"
+              onkeydown="pinBack(event, this, 3)"
+              id="pin3"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              inputmode="numeric"
+              pattern="[0-9]"
+              class="w-12 h-14 bg-ink border-2 border-white/10 rounded-xl text-center text-2xl font-bold text-white focus:outline-none focus:border-gold transition-colors"
+              oninput="pinInput(this, 4)"
+              onkeydown="pinBack(event, this, 4)"
+              id="pin4"
+            />
+          </div>
+
+          <div
+            id="w-pin-err"
+            class="hidden text-red-400 text-xs text-center mb-3"
+          ></div>
+
+          <button
+            onclick="verifyWithdrawPin()"
+            class="w-full bg-gradient-to-r from-gold to-gold-dark text-ink font-bold py-3.5 rounded-xl tracking-wider hover:opacity-90 transition-opacity"
+          >
+            CONFIRM WITHDRAWAL ✓
+          </button>
+          <p class="text-center text-white/20 text-[10px] mt-3">
+            Your code was sent to your registered email
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- TOAST -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <div
+      id="toast"
+      class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-green-500 text-white px-5 py-3 rounded-xl text-sm font-semibold z-50 pointer-events-none opacity-0 transition-all duration-300 whitespace-nowrap shadow-xl"
+    ></div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- WIN POPUP -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <div
+      id="win-popup"
+      class="fixed bottom-6 left-6 z-50 bg-surface border border-gold/50 rounded-2xl p-4 max-w-[260px] shadow-2xl flex items-center gap-3"
+      style="transform: translateX(-130%)"
+    >
+      <div class="text-3xl leading-none">🏆</div>
+      <div>
+        <div id="wp-name" class="font-bold text-sm text-white">James</div>
+        <div id="wp-detail" class="text-white/40 text-xs">
+          just won on FanDuel!
+        </div>
+        <div id="wp-amt" class="font-extrabold text-green-400 text-base mt-0.5">
+          +$3,600
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- SCRIPT -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <script src="/main.js"></script>
+  </body>
+</html>
