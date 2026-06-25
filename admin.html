@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RAYMONDPICKS — Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
       tailwind.config = {
@@ -53,7 +52,6 @@
           background-position: 100% center;
         }
       }
-
       .nav-item {
         display: flex;
         align-items: center;
@@ -76,10 +74,6 @@
         border-left: 2px solid #f0b429;
         border-radius: 0 10px 10px 0;
       }
-      .nav-item svg {
-        flex-shrink: 0;
-      }
-
       .toggle {
         position: relative;
         width: 40px;
@@ -115,14 +109,12 @@
       input:checked + .slider:before {
         transform: translateX(18px);
       }
-
       .page-section {
         display: none;
       }
       .page-section.active {
         display: block;
       }
-
       table {
         width: 100%;
         border-collapse: collapse;
@@ -144,7 +136,6 @@
       tr:hover td {
         background: rgba(255, 255, 255, 0.02);
       }
-
       ::-webkit-scrollbar {
         width: 4px;
       }
@@ -155,7 +146,6 @@
       input[type="number"]::-webkit-inner-spin-button {
         -webkit-appearance: none;
       }
-
       .pulse-dot {
         width: 8px;
         height: 8px;
@@ -172,7 +162,6 @@
           box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
         }
       }
-
       .stat-card {
         background: rgba(22, 29, 46, 0.8);
         border: 1px solid rgba(255, 255, 255, 0.07);
@@ -207,7 +196,6 @@
         color: #f87171;
         border: 1px solid rgba(239, 68, 68, 0.25);
       }
-
       .input-field {
         width: 100%;
         background: rgba(7, 9, 15, 0.6);
@@ -226,7 +214,6 @@
       .input-field::placeholder {
         color: rgba(255, 255, 255, 0.2);
       }
-
       .btn-gold {
         background: linear-gradient(135deg, #f0b429, #c88b00);
         color: #07090f;
@@ -274,7 +261,6 @@
       .btn-danger:hover {
         background: rgba(239, 68, 68, 0.2);
       }
-
       .section-label {
         font-size: 10px;
         font-weight: 700;
@@ -283,7 +269,6 @@
         text-transform: uppercase;
         margin-bottom: 8px;
       }
-
       .modal-overlay {
         position: fixed;
         inset: 0;
@@ -305,831 +290,1208 @@
         position: relative;
       }
 
-      /* Config banner */
-      #config-banner {
+      /* ── LOGIN SCREEN ── */
+      #login-screen {
+        position: fixed;
+        inset: 0;
+        background: #07090f;
+        z-index: 999;
         display: flex;
         align-items: center;
-        gap: 12px;
-        background: rgba(239, 68, 68, 0.1);
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        border-radius: 12px;
-        padding: 14px 18px;
-        margin-bottom: 20px;
+        justify-content: center;
+        font-family: "Inter", sans-serif;
+        overflow: hidden;
+      }
+      #login-screen .bg-radial {
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 60% 50% at 15% 100%,
+            rgba(240, 180, 41, 0.1) 0%,
+            transparent 65%
+          ),
+          radial-gradient(
+            ellipse 40% 35% at 90% 0%,
+            rgba(240, 180, 41, 0.06) 0%,
+            transparent 55%
+          );
+        pointer-events: none;
+      }
+      #login-screen .grid-bg {
+        position: absolute;
+        inset: 0;
+        opacity: 0.025;
+        background-image:
+          repeating-linear-gradient(
+            0deg,
+            #fff 0px,
+            #fff 1px,
+            transparent 1px,
+            transparent 52px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            #fff 0px,
+            #fff 1px,
+            transparent 1px,
+            transparent 52px
+          );
+        pointer-events: none;
+      }
+      .login-card {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        width: 860px;
+        max-width: 96vw;
+        min-height: 520px;
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+      }
+      .login-left {
+        width: 45%;
+        background: #0b0e18;
+        padding: 44px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+      }
+      .login-left .inner-glow {
+        position: absolute;
+        bottom: -60px;
+        left: -60px;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(
+          circle,
+          rgba(240, 180, 41, 0.12) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .login-right {
+        width: 55%;
+        background: #0f1420;
+        padding: 48px 44px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .login-logo {
+        font-family: "Bebas Neue", cursive;
+        font-size: 28px;
+        letter-spacing: 0.05em;
+        line-height: 1;
+      }
+      .login-logo-sub {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.18);
+        margin-top: 4px;
+      }
+      .login-headline {
+        font-family: "Bebas Neue", cursive;
+        font-size: 58px;
+        line-height: 0.93;
+        color: #fff;
+        letter-spacing: 0.02em;
+      }
+      .login-headline .gold {
+        color: #f0b429;
+      }
+      .login-eyebrow {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: #f0b429;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .login-eyebrow::before {
+        content: "";
+        display: inline-block;
+        width: 18px;
+        height: 1px;
+        background: #f0b429;
+      }
+      .login-desc {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.3);
+        line-height: 1.7;
+        margin-top: 14px;
+        max-width: 200px;
+      }
+      .login-stats {
+        display: flex;
+        gap: 20px;
+        padding-top: 22px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .login-stat-val {
+        font-family: "Bebas Neue", cursive;
+        font-size: 24px;
+        color: #f0b429;
+        line-height: 1;
+      }
+      .login-stat-lbl {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.25);
+        margin-top: 2px;
+      }
+      .login-stat-divider {
+        width: 1px;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .login-form-title {
+        font-family: "Bebas Neue", cursive;
+        font-size: 36px;
+        color: #fff;
+        letter-spacing: 0.04em;
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+      .login-form-sub {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.28);
+        margin-bottom: 30px;
+      }
+      .login-label {
+        display: block;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.28);
+        margin-bottom: 7px;
+      }
+      .login-input {
+        width: 100%;
+        box-sizing: border-box;
+        background: rgba(7, 9, 15, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 13px;
+        color: #fff;
+        font-family: "Inter", sans-serif;
+        outline: none;
+        transition:
+          border-color 0.2s,
+          background 0.2s;
+      }
+      .login-input:focus {
+        border-color: rgba(240, 180, 41, 0.55);
+        background: rgba(7, 9, 15, 0.95);
+      }
+      .login-input::placeholder {
+        color: rgba(255, 255, 255, 0.14);
+      }
+      .login-input.error {
+        border-color: rgba(239, 68, 68, 0.6);
+      }
+      .pw-wrap {
+        position: relative;
+      }
+      .pw-eye {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.22);
+        font-size: 17px;
+        padding: 0;
+        line-height: 1;
+        transition: color 0.2s;
+      }
+      .pw-eye:hover {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      .login-btn {
+        width: 100%;
+        padding: 13px;
+        background: linear-gradient(135deg, #f0b429, #c88b00);
+        border: none;
+        border-radius: 10px;
+        color: #07090f;
+        font-family: "Inter", sans-serif;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition:
+          opacity 0.2s,
+          transform 0.1s;
+      }
+      .login-btn:hover {
+        opacity: 0.88;
+      }
+      .login-btn:active {
+        transform: scale(0.98);
+      }
+      .login-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .login-err {
+        font-size: 11px;
+        color: #f87171;
+        text-align: center;
+        min-height: 16px;
+        margin-bottom: 2px;
+      }
+      .login-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        background: rgba(240, 180, 41, 0.06);
+        border: 1px solid rgba(240, 180, 41, 0.13);
+        border-radius: 9px;
+        padding: 10px 12px;
+        font-size: 10px;
+        color: rgba(240, 180, 41, 0.6);
+        line-height: 1.55;
+        margin-top: 16px;
+      }
+      .notice-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #f0b429;
+        flex-shrink: 0;
+        margin-top: 3px;
+        animation: goldpulse 2s infinite;
+      }
+      @keyframes goldpulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(240, 180, 41, 0.5);
+        }
+        50% {
+          box-shadow: 0 0 0 5px rgba(240, 180, 41, 0);
+        }
+      }
+      @keyframes loginFadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .login-card {
+        animation: loginFadeUp 0.5s ease both;
+      }
+
+      /* hide admin shell until logged in */
+      #admin-shell {
+        display: none;
       }
     </style>
   </head>
-  <body class="font-inter bg-ink text-white min-h-screen flex">
-    <!-- ══ SUPABASE CONFIG ══════════════════════════════════════════════════════
-  STEP 1: Replace the two values below with your real Supabase credentials.
-  Find them in: Supabase Dashboard → Project Settings → API
-  ══════════════════════════════════════════════════════════════════════════ -->
+  <body class="font-inter bg-ink text-white min-h-screen">
+    <!-- ══ LOGIN SCREEN ══ -->
+    <div id="login-screen">
+      <div class="bg-radial"></div>
+      <div class="grid-bg"></div>
 
-    <script>
-      // ── ADMIN AUTH ──
-      const ADMIN_PASSWORD = "Greatness1122!!"; // change this
-      const authed = sessionStorage.getItem("rp_admin");
-      if (!authed) {
-        const pw = prompt("Enter admin password:");
-        if (pw !== ADMIN_PASSWORD) {
-          document.body.innerHTML =
-            '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#fff;background:#07090f;font-size:1.2rem">⛔ Access Denied</div>';
-          throw new Error("Unauthorized");
-        }
-        sessionStorage.setItem("rp_admin", "1");
-      }
-      const SUPABASE_URL = "https://wtyqmqqobswhtqbikudr.supabase.co";
-      const SUPABASE_ANON_KEY =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0eXFtcXFvYnN3aHRxYmlrdWRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMDA0ODgsImV4cCI6MjA5Nzg3NjQ4OH0.7YUUINCzWGLtMmvhFYXe2js9-c00eZ4IliqKhE5J3Ig";
+      <div class="login-card">
+        <!-- Left brand panel -->
+        <div class="login-left">
+          <div class="inner-glow"></div>
 
-      const { createClient } = supabase;
-      const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    </script>
+          <div style="position: relative; z-index: 2">
+            <div class="login-logo shimmer-text">RAYMONDPICKS</div>
+            <div class="login-logo-sub">Sports Intelligence Platform</div>
+          </div>
 
-    <!-- ══ SIDEBAR ══ -->
-    <aside
-      class="w-60 flex-shrink-0 bg-surface border-r border-white/5 flex flex-col min-h-screen sticky top-0 h-screen overflow-y-auto"
-    >
-      <div class="p-5 border-b border-white/5">
-        <div class="font-bebas text-2xl shimmer-text leading-none">
-          RAYMONDPICKS
-        </div>
-        <div class="text-[10px] font-bold text-white/25 tracking-widest mt-1">
-          ADMIN PANEL
-        </div>
-      </div>
-      <nav class="flex-1 p-3 space-y-0.5 mt-2">
-        <div class="nav-item active" onclick="showSection('overview')">
-          <svg
-            width="16"
-            height="16"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <rect x="3" y="3" width="7" height="7" rx="1" />
-            <rect x="14" y="3" width="7" height="7" rx="1" />
-            <rect x="3" y="14" width="7" height="7" rx="1" />
-            <rect x="14" y="14" width="7" height="7" rx="1" />
-          </svg>
-          Overview
-        </div>
-        <div class="nav-item" onclick="showSection('users')">
-          <svg
-            width="16"
-            height="16"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
-          </svg>
-          Users
-        </div>
-        <div class="nav-item" onclick="showSection('balances')">
-          <svg
-            width="16"
-            height="16"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <line x1="12" y1="1" x2="12" y2="23" />
-            <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
-          </svg>
-          Balances
-        </div>
-        <div class="nav-item" onclick="showSection('payments')">
-          <svg
-            width="16"
-            height="16"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <rect x="1" y="4" width="22" height="16" rx="2" />
-            <line x1="1" y1="10" x2="23" y2="10" />
-          </svg>
-          Payment Info
-        </div>
-        <div class="nav-item" onclick="showSection('withdrawals')">
-          <svg
-            width="16"
-            height="16"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-            <polyline points="7 10 12 15 17 10" />
-            <line x1="12" y1="15" x2="12" y2="3" />
-          </svg>
-          Withdrawals
-        </div>
-        <div class="pt-4 pb-1 px-2">
-          <div
-            class="text-[10px] font-bold text-white/15 tracking-widest uppercase"
-          >
-            System
+          <div style="position: relative; z-index: 2">
+            <div class="login-eyebrow">Admin Access</div>
+            <div class="login-headline">
+              THE<br />EDGE IS<br /><span class="gold">YOURS.</span>
+            </div>
+            <div class="login-desc">
+              Manage members, monitor picks, and control the full operation from
+              one place.
+            </div>
+          </div>
+
+          <div class="login-stats" style="position: relative; z-index: 2">
+            <div>
+              <div class="login-stat-val">72%</div>
+              <div class="login-stat-lbl">Win Rate</div>
+            </div>
+            <div class="login-stat-divider"></div>
+            <div>
+              <div class="login-stat-val">3</div>
+              <div class="login-stat-lbl">Plans</div>
+            </div>
+            <div class="login-stat-divider"></div>
+            <div>
+              <div class="login-stat-val">24/7</div>
+              <div class="login-stat-lbl">Live Data</div>
+            </div>
           </div>
         </div>
-        <div class="nav-item" onclick="showSection('settings')">
-          <svg
-            width="16"
-            height="16"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="12" r="3" />
-            <path
-              d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+
+        <!-- Right form panel -->
+        <div class="login-right">
+          <div class="login-form-title">Sign In</div>
+          <div class="login-form-sub">
+            Enter your admin credentials to continue
+          </div>
+
+          <div style="margin-bottom: 16px">
+            <label class="login-label">Email Address</label>
+            <input
+              class="login-input"
+              type="email"
+              id="login-email"
+              placeholder="raymond@gmail.com"
+              autocomplete="email"
             />
-          </svg>
-          Settings
-        </div>
-      </nav>
-      <div class="p-4 border-t border-white/5">
-        <div class="flex items-center gap-3">
-          <div
-            class="w-8 h-8 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center font-bebas text-ink text-sm"
+          </div>
+
+          <div style="margin-bottom: 6px">
+            <label class="login-label">Password</label>
+            <div class="pw-wrap">
+              <input
+                class="login-input"
+                type="password"
+                id="login-pw"
+                placeholder="••••••••••••"
+                style="padding-right: 40px"
+                autocomplete="current-password"
+              />
+              <button
+                class="pw-eye"
+                onclick="toggleLoginPw()"
+                id="login-eye"
+                type="button"
+              >
+                👁
+              </button>
+            </div>
+          </div>
+
+          <div class="login-err" id="login-err"></div>
+
+          <button
+            class="login-btn"
+            id="login-btn"
+            onclick="doAdminLogin()"
+            style="margin-top: 10px"
           >
-            R
+            Access Dashboard
+          </button>
+
+          <div class="login-notice">
+            <div class="notice-dot"></div>
+            <div>
+              Access is restricted to authorized administrators only. All
+              sessions are monitored.
+            </div>
           </div>
-          <div>
-            <div class="text-xs font-bold">Raymond</div>
-            <div class="text-[10px] text-white/30">Super Admin</div>
-          </div>
-          <div class="ml-auto pulse-dot"></div>
         </div>
       </div>
-    </aside>
+    </div>
 
-    <!-- ══ MAIN ══ -->
-    <main class="flex-1 overflow-y-auto min-h-screen">
-      <header
-        class="sticky top-0 z-40 bg-ink/90 backdrop-blur-xl border-b border-white/5 px-6 py-3.5 flex items-center justify-between"
+    <!-- ══ ADMIN SHELL ══ -->
+    <div id="admin-shell" class="flex min-h-screen">
+      <!-- ══ SIDEBAR ══ -->
+      <aside
+        class="w-60 flex-shrink-0 bg-surface border-r border-white/5 flex flex-col min-h-screen sticky top-0 h-screen overflow-y-auto"
       >
-        <div>
-          <span
-            id="page-title"
-            class="font-bebas text-xl text-white tracking-wide"
-            >Overview</span
-          >
-          <span class="text-white/25 text-xs ml-2" id="page-sub"
-            >Dashboard summary</span
-          >
+        <div class="p-5 border-b border-white/5">
+          <div class="font-bebas text-2xl shimmer-text leading-none">
+            RAYMONDPICKS
+          </div>
+          <div class="text-[10px] font-bold text-white/25 tracking-widest mt-1">
+            ADMIN PANEL
+          </div>
         </div>
-        <div class="flex items-center gap-3">
-          <div
-            class="flex items-center gap-2 bg-green-400/10 border border-green-400/20 rounded-full px-3 py-1.5"
-          >
-            <div class="pulse-dot" style="width: 6px; height: 6px"></div>
-            <span class="text-green-400 text-xs font-bold" id="live-count"
-              >— Online</span
+        <nav class="flex-1 p-3 space-y-0.5 mt-2">
+          <div class="nav-item active" onclick="showSection('overview')">
+            <svg
+              width="16"
+              height="16"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
             >
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            Overview
           </div>
-          <div class="text-white/25 text-xs" id="clock"></div>
-        </div>
-      </header>
-
-      <div class="p-6 space-y-6">
-        <!-- ══ OVERVIEW ══ -->
-        <section class="page-section active space-y-6" id="section-overview">
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="stat-card">
-              <div class="section-label">Total Users</div>
-              <div
-                class="font-bebas text-4xl text-white leading-none"
-                id="ov-total-users"
-              >
-                —
-              </div>
-              <div class="text-white/30 text-xs mt-2">All members</div>
-            </div>
-            <div class="stat-card">
-              <div class="section-label">Total Deposited</div>
-              <div
-                class="font-bebas text-4xl text-gold leading-none"
-                id="ov-total-deposited"
-              >
-                —
-              </div>
-              <div class="text-white/30 text-xs mt-2">Cumulative</div>
-            </div>
-            <div class="stat-card">
-              <div class="section-label">Total Balance</div>
-              <div
-                class="font-bebas text-4xl text-green-400 leading-none"
-                id="ov-total-balance"
-              >
-                —
-              </div>
-              <div class="text-white/30 text-xs mt-2">Across all users</div>
-            </div>
-            <div class="stat-card">
-              <div class="section-label">Pending Withdrawals</div>
-              <div
-                class="font-bebas text-4xl text-red-400 leading-none"
-                id="ov-pending-w"
-              >
-                —
-              </div>
-              <div class="text-white/30 text-xs mt-2">Awaiting action</div>
-            </div>
+          <div class="nav-item" onclick="showSection('users')">
+            <svg
+              width="16"
+              height="16"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+            </svg>
+            Users
           </div>
-
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div class="stat-card">
-              <div class="section-label mb-4">Members by Plan</div>
-              <div id="plan-breakdown" class="space-y-3">
-                <div class="text-white/30 text-sm">Loading…</div>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="section-label mb-4">Revenue by Payment Method</div>
-              <div class="space-y-3">
-                <div
-                  class="flex items-center justify-between py-2 border-b border-white/4"
-                >
-                  <div class="flex items-center gap-2">
-                    <span class="text-lg">💚</span
-                    ><span class="text-sm text-white/60">Chime</span>
-                  </div>
-                  <span class="font-bold text-white">$213,400</span>
-                </div>
-                <div
-                  class="flex items-center justify-between py-2 border-b border-white/4"
-                >
-                  <div class="flex items-center gap-2">
-                    <span class="text-lg">💜</span
-                    ><span class="text-sm text-white/60">Zelle</span>
-                  </div>
-                  <span class="font-bold text-white">$289,700</span>
-                </div>
-                <div
-                  class="flex items-center justify-between py-2 border-b border-white/4"
-                >
-                  <div class="flex items-center gap-2">
-                    <span class="text-lg">🍎</span
-                    ><span class="text-sm text-white/60">Apple Pay</span>
-                  </div>
-                  <span class="font-bold text-white">$156,900</span>
-                </div>
-                <div class="flex items-center justify-between py-2">
-                  <div class="flex items-center gap-2">
-                    <span class="text-lg">₿</span
-                    ><span class="text-sm text-white/60">Bitcoin</span>
-                  </div>
-                  <span class="font-bold text-white">$88,200</span>
-                </div>
-              </div>
-            </div>
+          <div class="nav-item" onclick="showSection('balances')">
+            <svg
+              width="16"
+              height="16"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+            </svg>
+            Balances
           </div>
-        </section>
-
-        <!-- ══ USERS ══ -->
-        <section class="page-section space-y-5" id="section-users">
-          <div class="flex items-center justify-between gap-3 flex-wrap">
-            <div class="flex items-center gap-3">
-              <input
-                type="text"
-                class="input-field"
-                style="width: 240px"
-                placeholder="Search by name or email…"
-                oninput="filterUsers(this.value)"
-              />
-              <select
-                class="input-field"
-                style="width: 150px"
-                onchange="filterUsersPlan(this.value)"
-              >
-                <option value="all">All Plans</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-                <option value="lifetime">Lifetime</option>
-              </select>
-            </div>
-            <button class="btn-gold" onclick="openAddUserModal()">
-              + Add User
-            </button>
+          <div class="nav-item" onclick="showSection('payments')">
+            <svg
+              width="16"
+              height="16"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="1" y="4" width="22" height="16" rx="2" />
+              <line x1="1" y1="10" x2="23" y2="10" />
+            </svg>
+            Payment Info
           </div>
-          <div class="stat-card overflow-x-auto p-0">
-            <table id="users-table">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Plan</th>
-                  <th>Status</th>
-                  <th>Deposited</th>
-                  <th>Balance</th>
-                  <th>Joined</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="users-tbody">
-                <tr>
-                  <td
-                    colspan="7"
-                    style="
-                      text-align: center;
-                      padding: 32px;
-                      color: rgba(255, 255, 255, 0.25);
-                    "
-                  >
-                    Loading…
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="nav-item" onclick="showSection('withdrawals')">
+            <svg
+              width="16"
+              height="16"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Withdrawals
           </div>
-        </section>
-
-        <!-- ══ BALANCES ══ -->
-        <section class="page-section space-y-5" id="section-balances">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="stat-card">
-              <div class="section-label">Total Available Balance</div>
-              <div
-                class="font-bebas text-4xl text-green-400 leading-none"
-                id="bal-available-total"
-              >
-                —
-              </div>
-              <div class="text-white/30 text-xs mt-2">Across all users</div>
-            </div>
-            <div class="stat-card">
-              <div class="section-label">Total Deposited</div>
-              <div
-                class="font-bebas text-4xl text-gold leading-none"
-                id="bal-deposited-total"
-              >
-                —
-              </div>
-              <div class="text-white/30 text-xs mt-2">Cumulative</div>
-            </div>
-            <div class="stat-card">
-              <div class="section-label">Bulk Balance Update</div>
-              <div class="space-y-3 mt-2">
-                <select class="input-field" id="bulk-plan-filter">
-                  <option value="all">All Users</option>
-                  <option value="monthly">Monthly only</option>
-                  <option value="yearly">Yearly only</option>
-                  <option value="lifetime">Lifetime only</option>
-                </select>
-                <div class="flex gap-2">
-                  <input
-                    type="number"
-                    class="input-field"
-                    id="bulk-amount"
-                    placeholder="Amount ($)"
-                  />
-                  <button
-                    class="btn-gold whitespace-nowrap"
-                    onclick="bulkUpdateBalance()"
-                  >
-                    Set All
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="stat-card overflow-x-auto p-0">
+          <div class="pt-4 pb-1 px-2">
             <div
-              class="px-5 py-4 border-b border-white/5 flex items-center justify-between"
+              class="text-[10px] font-bold text-white/15 tracking-widest uppercase"
             >
-              <div class="font-semibold text-sm">Per-User Balance Manager</div>
-              <div class="text-white/30 text-xs">
-                Click Edit to update a user's balance
-              </div>
+              System
             </div>
-            <table>
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Plan</th>
-                  <th>Available Balance</th>
-                  <th>Deposited</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="balances-tbody">
-                <tr>
-                  <td
-                    colspan="5"
-                    style="
-                      text-align: center;
-                      padding: 32px;
-                      color: rgba(255, 255, 255, 0.25);
-                    "
-                  >
-                    Loading…
-                  </td>
-                </tr>
-              </tbody>
-            </table>
           </div>
-        </section>
+          <div class="nav-item" onclick="showSection('settings')">
+            <svg
+              width="16"
+              height="16"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+              />
+            </svg>
+            Settings
+          </div>
+        </nav>
+        <div class="p-4 border-t border-white/5">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-8 h-8 rounded-full bg-gradient-to-br from-gold to-gold-dark flex items-center justify-center font-bebas text-ink text-sm"
+            >
+              R
+            </div>
+            <div>
+              <div class="text-xs font-bold">Raymond</div>
+              <div class="text-[10px] text-white/30">Super Admin</div>
+            </div>
+            <div class="ml-auto pulse-dot"></div>
+          </div>
+          <button
+            onclick="doLogout()"
+            style="
+              margin-top: 12px;
+              width: 100%;
+              background: rgba(255, 255, 255, 0.04);
+              border: 1px solid rgba(255, 255, 255, 0.07);
+              border-radius: 8px;
+              padding: 7px;
+              font-size: 11px;
+              font-weight: 600;
+              color: rgba(255, 255, 255, 0.3);
+              cursor: pointer;
+              transition: all 0.2s;
+              font-family: inherit;
+            "
+            onmouseover="
+              this.style.color = '#f87171';
+              this.style.borderColor = 'rgba(239,68,68,0.3)';
+            "
+            onmouseout="
+              this.style.color = 'rgba(255,255,255,0.3)';
+              this.style.borderColor = 'rgba(255,255,255,0.07)';
+            "
+          >
+            Sign Out
+          </button>
+        </div>
+      </aside>
 
-        <!-- ══ PAYMENT INFO ══ -->
-        <section class="page-section space-y-5" id="section-payments">
-          <p class="text-white/40 text-sm">
-            Edit payment addresses shown to users at checkout. Changes are saved
-            to Supabase and apply immediately.
-          </p>
-
-          <!-- Chime -->
-          <div class="stat-card space-y-4">
-            <div class="flex items-center gap-3 mb-2">
-              <div
-                class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
-                style="
-                  background: rgba(6, 193, 103, 0.15);
-                  border: 1px solid rgba(6, 193, 103, 0.3);
-                "
+      <!-- ══ MAIN ══ -->
+      <main class="flex-1 overflow-y-auto min-h-screen">
+        <header
+          class="sticky top-0 z-40 bg-ink/90 backdrop-blur-xl border-b border-white/5 px-6 py-3.5 flex items-center justify-between"
+        >
+          <div>
+            <span
+              id="page-title"
+              class="font-bebas text-xl text-white tracking-wide"
+              >Overview</span
+            >
+            <span class="text-white/25 text-xs ml-2" id="page-sub"
+              >Dashboard summary</span
+            >
+          </div>
+          <div class="flex items-center gap-3">
+            <div
+              class="flex items-center gap-2 bg-green-400/10 border border-green-400/20 rounded-full px-3 py-1.5"
+            >
+              <div class="pulse-dot" style="width: 6px; height: 6px"></div>
+              <span class="text-green-400 text-xs font-bold" id="live-count"
+                >— Online</span
               >
-                💚
+            </div>
+            <div class="text-white/25 text-xs" id="clock"></div>
+          </div>
+        </header>
+
+        <div class="p-6 space-y-6">
+          <!-- ══ OVERVIEW ══ -->
+          <section class="page-section active space-y-6" id="section-overview">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="stat-card">
+                <div class="section-label">Total Users</div>
+                <div
+                  class="font-bebas text-4xl text-white leading-none"
+                  id="ov-total-users"
+                >
+                  —
+                </div>
+                <div class="text-white/30 text-xs mt-2">All members</div>
               </div>
-              <div>
-                <div class="font-bold">Chime</div>
-                <div class="text-white/30 text-xs">$Tag and phone number</div>
+              <div class="stat-card">
+                <div class="section-label">Total Deposited</div>
+                <div
+                  class="font-bebas text-4xl text-gold leading-none"
+                  id="ov-total-deposited"
+                >
+                  —
+                </div>
+                <div class="text-white/30 text-xs mt-2">Cumulative</div>
               </div>
-              <div class="ml-auto">
-                <span class="badge badge-green">ACTIVE</span>
+              <div class="stat-card">
+                <div class="section-label">Total Balance</div>
+                <div
+                  class="font-bebas text-4xl text-green-400 leading-none"
+                  id="ov-total-balance"
+                >
+                  —
+                </div>
+                <div class="text-white/30 text-xs mt-2">Across all users</div>
+              </div>
+              <div class="stat-card">
+                <div class="section-label">Pending Withdrawals</div>
+                <div
+                  class="font-bebas text-4xl text-red-400 leading-none"
+                  id="ov-pending-w"
+                >
+                  —
+                </div>
+                <div class="text-white/30 text-xs mt-2">Awaiting action</div>
               </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <div class="section-label">Chime $Tag</div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div class="stat-card">
+                <div class="section-label mb-4">Members by Plan</div>
+                <div id="plan-breakdown" class="space-y-3">
+                  <div class="text-white/30 text-sm">Loading…</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="section-label mb-4">Online Users</div>
+                <div id="online-users-list" class="space-y-2">
+                  <div class="text-white/30 text-sm">Loading…</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ══ USERS ══ -->
+          <section class="page-section space-y-5" id="section-users">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <div class="flex items-center gap-3">
                 <input
                   type="text"
                   class="input-field"
-                  id="chime-tag"
-                  placeholder="$RaymondPicks"
+                  style="width: 240px"
+                  placeholder="Search by name or email…"
+                  oninput="filterUsers(this.value)"
                 />
-              </div>
-              <div>
-                <div class="section-label">Phone Number</div>
-                <input
-                  type="text"
+                <select
                   class="input-field"
-                  id="chime-phone"
-                  placeholder="(305) 555-0142"
-                />
+                  style="width: 150px"
+                  onchange="filterUsersPlan(this.value)"
+                >
+                  <option value="all">All Plans</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                  <option value="lifetime">Lifetime</option>
+                </select>
               </div>
+              <button class="btn-gold" onclick="openAddUserModal()">
+                + Add User
+              </button>
             </div>
-            <button class="btn-gold" onclick="savePayment('chime')">
-              Save Chime Info
-            </button>
-          </div>
+            <div class="stat-card overflow-x-auto p-0">
+              <table id="users-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Plan</th>
+                    <th>Status</th>
+                    <th>Deposited</th>
+                    <th>Balance</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="users-tbody">
+                  <tr>
+                    <td
+                      colspan="7"
+                      style="
+                        text-align: center;
+                        padding: 32px;
+                        color: rgba(255, 255, 255, 0.25);
+                      "
+                    >
+                      Loading…
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
 
-          <!-- Zelle -->
-          <div class="stat-card space-y-4">
-            <div class="flex items-center gap-3 mb-2">
-              <div
-                class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
-                style="
-                  background: rgba(139, 92, 246, 0.15);
-                  border: 1px solid rgba(139, 92, 246, 0.3);
-                "
-              >
-                💜
+          <!-- ══ BALANCES ══ -->
+          <section class="page-section space-y-5" id="section-balances">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="stat-card">
+                <div class="section-label">Total Available Balance</div>
+                <div
+                  class="font-bebas text-4xl text-green-400 leading-none"
+                  id="bal-available-total"
+                >
+                  —
+                </div>
+                <div class="text-white/30 text-xs mt-2">Across all users</div>
               </div>
-              <div>
-                <div class="font-bold">Zelle</div>
-                <div class="text-white/30 text-xs">Email and phone number</div>
+              <div class="stat-card">
+                <div class="section-label">Total Deposited</div>
+                <div
+                  class="font-bebas text-4xl text-gold leading-none"
+                  id="bal-deposited-total"
+                >
+                  —
+                </div>
+                <div class="text-white/30 text-xs mt-2">Cumulative</div>
               </div>
-              <div class="ml-auto">
-                <span class="badge badge-green">ACTIVE</span>
+              <div class="stat-card">
+                <div class="section-label">Bulk Balance Update</div>
+                <div class="space-y-3 mt-2">
+                  <select class="input-field" id="bulk-plan-filter">
+                    <option value="all">All Users</option>
+                    <option value="monthly">Monthly only</option>
+                    <option value="yearly">Yearly only</option>
+                    <option value="lifetime">Lifetime only</option>
+                  </select>
+                  <div class="flex gap-2">
+                    <input
+                      type="number"
+                      class="input-field"
+                      id="bulk-amount"
+                      placeholder="Amount ($)"
+                    /><button
+                      class="btn-gold whitespace-nowrap"
+                      onclick="bulkUpdateBalance()"
+                    >
+                      Set All
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="stat-card overflow-x-auto p-0">
+              <div
+                class="px-5 py-4 border-b border-white/5 flex items-center justify-between"
+              >
+                <div class="font-semibold text-sm">
+                  Per-User Balance Manager
+                </div>
+                <div class="text-white/30 text-xs">
+                  Click Edit to update a user's balance
+                </div>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Plan</th>
+                    <th>Available Balance</th>
+                    <th>Deposited</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="balances-tbody">
+                  <tr>
+                    <td
+                      colspan="5"
+                      style="
+                        text-align: center;
+                        padding: 32px;
+                        color: rgba(255, 255, 255, 0.25);
+                      "
+                    >
+                      Loading…
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- ══ PAYMENT INFO ══ -->
+          <section class="page-section space-y-5" id="section-payments">
+            <p class="text-white/40 text-sm">
+              Edit payment addresses shown to users at checkout. Changes save to
+              Supabase and apply immediately on the site.
+            </p>
+            <div class="stat-card space-y-4">
+              <div class="flex items-center gap-3 mb-2">
+                <div
+                  class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                  style="
+                    background: rgba(6, 193, 103, 0.15);
+                    border: 1px solid rgba(6, 193, 103, 0.3);
+                  "
+                >
+                  💚
+                </div>
+                <div>
+                  <div class="font-bold">Chime</div>
+                  <div class="text-white/30 text-xs">$Tag and phone number</div>
+                </div>
+                <div class="ml-auto">
+                  <span class="badge badge-green">ACTIVE</span>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <div class="section-label">Chime $Tag</div>
+                  <input
+                    type="text"
+                    class="input-field"
+                    id="chime-tag"
+                    placeholder="$RaymondPicks"
+                  />
+                </div>
+                <div>
+                  <div class="section-label">Phone Number</div>
+                  <input
+                    type="text"
+                    class="input-field"
+                    id="chime-phone"
+                    placeholder="(305) 555-0142"
+                  />
+                </div>
+              </div>
+              <button class="btn-gold" onclick="savePayment('chime')">
+                Save Chime Info
+              </button>
+            </div>
+            <div class="stat-card space-y-4">
+              <div class="flex items-center gap-3 mb-2">
+                <div
+                  class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                  style="
+                    background: rgba(139, 92, 246, 0.15);
+                    border: 1px solid rgba(139, 92, 246, 0.3);
+                  "
+                >
+                  💜
+                </div>
+                <div>
+                  <div class="font-bold">Zelle</div>
+                  <div class="text-white/30 text-xs">
+                    Email and phone number
+                  </div>
+                </div>
+                <div class="ml-auto">
+                  <span class="badge badge-green">ACTIVE</span>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <div class="section-label">Zelle Email</div>
+                  <input
+                    type="email"
+                    class="input-field"
+                    id="zelle-email"
+                    placeholder="pay@raymondpicks.com"
+                  />
+                </div>
+                <div>
+                  <div class="section-label">Phone Number</div>
+                  <input
+                    type="text"
+                    class="input-field"
+                    id="zelle-phone"
+                    placeholder="(305) 555-0142"
+                  />
+                </div>
+              </div>
+              <button class="btn-gold" onclick="savePayment('zelle')">
+                Save Zelle Info
+              </button>
+            </div>
+            <div class="stat-card space-y-4">
+              <div class="flex items-center gap-3 mb-2">
+                <div
+                  class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                  style="
+                    background: rgba(255, 255, 255, 0.08);
+                    border: 1px solid rgba(255, 255, 255, 0.15);
+                  "
+                >
+                  🍎
+                </div>
+                <div>
+                  <div class="font-bold">Apple Pay</div>
+                  <div class="text-white/30 text-xs">iCloud email</div>
+                </div>
+                <div class="ml-auto">
+                  <span class="badge badge-green">ACTIVE</span>
+                </div>
+              </div>
               <div>
-                <div class="section-label">Zelle Email</div>
+                <div class="section-label">Apple ID (iCloud Email)</div>
                 <input
                   type="email"
                   class="input-field"
-                  id="zelle-email"
-                  placeholder="pay@raymondpicks.com"
+                  id="apple-id"
+                  placeholder="raymondpicks@icloud.com"
                 />
               </div>
-              <div>
-                <div class="section-label">Phone Number</div>
-                <input
-                  type="text"
-                  class="input-field"
-                  id="zelle-phone"
-                  placeholder="(305) 555-0142"
-                />
-              </div>
-            </div>
-            <button class="btn-gold" onclick="savePayment('zelle')">
-              Save Zelle Info
-            </button>
-          </div>
-
-          <!-- Apple Pay -->
-          <div class="stat-card space-y-4">
-            <div class="flex items-center gap-3 mb-2">
-              <div
-                class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
-                style="
-                  background: rgba(255, 255, 255, 0.08);
-                  border: 1px solid rgba(255, 255, 255, 0.15);
-                "
-              >
-                🍎
-              </div>
-              <div>
-                <div class="font-bold">Apple Pay</div>
-                <div class="text-white/30 text-xs">iCloud email</div>
-              </div>
-              <div class="ml-auto">
-                <span class="badge badge-green">ACTIVE</span>
-              </div>
-            </div>
-            <div>
-              <div class="section-label">Apple ID (iCloud Email)</div>
-              <input
-                type="email"
-                class="input-field"
-                id="apple-id"
-                placeholder="raymondpicks@icloud.com"
-              />
-            </div>
-            <button class="btn-gold" onclick="savePayment('apple')">
-              Save Apple Pay Info
-            </button>
-          </div>
-
-          <!-- Bitcoin -->
-          <div class="stat-card space-y-4">
-            <div class="flex items-center gap-3 mb-2">
-              <div
-                class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
-                style="
-                  background: rgba(251, 146, 60, 0.15);
-                  border: 1px solid rgba(251, 146, 60, 0.3);
-                "
-              >
-                ₿
-              </div>
-              <div>
-                <div class="font-bold">Bitcoin</div>
-                <div class="text-white/30 text-xs">BTC wallet address</div>
-              </div>
-              <div class="ml-auto">
-                <span class="badge badge-gold">CRYPTO</span>
-              </div>
-            </div>
-            <div>
-              <div class="section-label">Bitcoin Wallet Address</div>
-              <input
-                type="text"
-                class="input-field font-mono"
-                id="btc-address"
-                placeholder="bc1q…"
-              />
-            </div>
-            <div
-              class="bg-orange-400/5 border border-orange-400/15 rounded-xl p-3 text-xs text-orange-300/70 leading-relaxed"
-            >
-              ⚠️ Double-check every character before saving. Bitcoin
-              transactions are irreversible.
-            </div>
-            <button class="btn-gold" onclick="savePayment('bitcoin')">
-              Save Bitcoin Address
-            </button>
-          </div>
-        </section>
-
-        <!-- ══ WITHDRAWALS ══ -->
-        <section class="page-section space-y-5" id="section-withdrawals">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="stat-card">
-              <div class="section-label">Pending</div>
-              <div
-                class="font-bebas text-4xl text-yellow-400 leading-none"
-                id="w-pending-ct"
-              >
-                —
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="section-label">Approved</div>
-              <div
-                class="font-bebas text-4xl text-green-400 leading-none"
-                id="w-approved-ct"
-              >
-                —
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="section-label">Total Requests</div>
-              <div
-                class="font-bebas text-4xl text-gold leading-none"
-                id="w-total-ct"
-              >
-                —
-              </div>
-            </div>
-          </div>
-          <div class="stat-card overflow-x-auto p-0">
-            <div class="px-5 py-4 border-b border-white/5">
-              <div class="font-semibold text-sm">Withdrawal Requests</div>
-            </div>
-            <table>
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Amount</th>
-                  <th>Method</th>
-                  <th>Account</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="withdrawals-tbody">
-                <tr>
-                  <td
-                    colspan="7"
-                    style="
-                      text-align: center;
-                      padding: 32px;
-                      color: rgba(255, 255, 255, 0.25);
-                    "
-                  >
-                    Loading…
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- ══ SETTINGS ══ -->
-        <section class="page-section space-y-5" id="section-settings">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="stat-card space-y-4">
-              <div class="font-semibold mb-1">Site Controls</div>
-              <div
-                class="flex items-center justify-between py-3 border-b border-white/5"
-              >
-                <div>
-                  <div class="text-sm font-semibold">
-                    Win Popup Notifications
-                  </div>
-                  <div class="text-white/30 text-xs">
-                    Show live win popups on landing page
-                  </div>
-                </div>
-                <label class="toggle"
-                  ><input
-                    type="checkbox"
-                    checked
-                    onchange="settingToggle(this, 'win-popup')" /><span
-                    class="slider"
-                  ></span
-                ></label>
-              </div>
-              <div
-                class="flex items-center justify-between py-3 border-b border-white/5"
-              >
-                <div>
-                  <div class="text-sm font-semibold">New Signups Enabled</div>
-                  <div class="text-white/30 text-xs">
-                    Allow new users to register
-                  </div>
-                </div>
-                <label class="toggle"
-                  ><input
-                    type="checkbox"
-                    checked
-                    onchange="settingToggle(this, 'signups')" /><span
-                    class="slider"
-                  ></span
-                ></label>
-              </div>
-              <div
-                class="flex items-center justify-between py-3 border-b border-white/5"
-              >
-                <div>
-                  <div class="text-sm font-semibold">Bitcoin Payments</div>
-                  <div class="text-white/30 text-xs">
-                    Show Bitcoin at checkout
-                  </div>
-                </div>
-                <label class="toggle"
-                  ><input
-                    type="checkbox"
-                    checked
-                    onchange="settingToggle(this, 'btc')" /><span
-                    class="slider"
-                  ></span
-                ></label>
-              </div>
-              <div class="flex items-center justify-between py-3">
-                <div>
-                  <div class="text-sm font-semibold">Maintenance Mode</div>
-                  <div class="text-white/30 text-xs">Block all user access</div>
-                </div>
-                <label class="toggle"
-                  ><input
-                    type="checkbox"
-                    onchange="settingToggle(this, 'maintenance')" /><span
-                    class="slider"
-                  ></span
-                ></label>
-              </div>
-            </div>
-
-            <div class="stat-card space-y-4">
-              <div class="font-semibold mb-1">Withdrawal PIN</div>
-              <p class="text-white/40 text-xs leading-relaxed">
-                Change the 5-digit PIN users must enter to confirm a withdrawal.
-              </p>
-              <div>
-                <div class="section-label">Current PIN</div>
-                <input
-                  type="password"
-                  class="input-field"
-                  id="current-pin"
-                  placeholder="Enter current PIN"
-                />
-              </div>
-              <div>
-                <div class="section-label">New PIN (5 digits)</div>
-                <input
-                  type="text"
-                  class="input-field"
-                  id="new-pin"
-                  maxlength="5"
-                  placeholder="e.g. 84921"
-                />
-              </div>
-              <div>
-                <div class="section-label">Confirm New PIN</div>
-                <input
-                  type="text"
-                  class="input-field"
-                  id="confirm-pin"
-                  maxlength="5"
-                  placeholder="Repeat PIN"
-                />
-              </div>
-              <div id="pin-err" class="text-red-400 text-xs hidden"></div>
-              <button class="btn-gold w-full" onclick="changePIN()">
-                Update Withdrawal PIN
+              <button class="btn-gold" onclick="savePayment('apple')">
+                Save Apple Pay Info
               </button>
             </div>
-
-            <div class="stat-card space-y-4 md:col-span-2">
-              <div class="font-semibold mb-1">Plan Pricing</div>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <div class="section-label">Monthly Price ($)</div>
-                  <input
-                    type="number"
-                    class="input-field"
-                    id="price-monthly"
-                    value="150"
-                  />
+            <div class="stat-card space-y-4">
+              <div class="flex items-center gap-3 mb-2">
+                <div
+                  class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                  style="
+                    background: rgba(251, 146, 60, 0.15);
+                    border: 1px solid rgba(251, 146, 60, 0.3);
+                  "
+                >
+                  ₿
                 </div>
                 <div>
-                  <div class="section-label">Yearly Price ($)</div>
-                  <input
-                    type="number"
-                    class="input-field"
-                    id="price-yearly"
-                    value="1000"
-                  />
+                  <div class="font-bold">Bitcoin</div>
+                  <div class="text-white/30 text-xs">BTC wallet address</div>
                 </div>
-                <div>
-                  <div class="section-label">Lifetime Price ($)</div>
-                  <input
-                    type="number"
-                    class="input-field"
-                    id="price-lifetime"
-                    value="1500"
-                  />
+                <div class="ml-auto">
+                  <span class="badge badge-gold">CRYPTO</span>
                 </div>
               </div>
-              <button class="btn-gold" onclick="savePricing()">
-                Save Pricing
+              <div>
+                <div class="section-label">Bitcoin Wallet Address</div>
+                <input
+                  type="text"
+                  class="input-field font-mono"
+                  id="btc-address"
+                  placeholder="bc1q…"
+                />
+              </div>
+              <div
+                class="bg-orange-400/5 border border-orange-400/15 rounded-xl p-3 text-xs text-orange-300/70 leading-relaxed"
+              >
+                ⚠️ Double-check every character before saving. Bitcoin
+                transactions are irreversible.
+              </div>
+              <button class="btn-gold" onclick="savePayment('bitcoin')">
+                Save Bitcoin Address
               </button>
             </div>
-          </div>
-        </section>
-      </div>
-    </main>
+          </section>
+
+          <!-- ══ WITHDRAWALS ══ -->
+          <section class="page-section space-y-5" id="section-withdrawals">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="stat-card">
+                <div class="section-label">Pending</div>
+                <div
+                  class="font-bebas text-4xl text-yellow-400 leading-none"
+                  id="w-pending-ct"
+                >
+                  —
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="section-label">Approved</div>
+                <div
+                  class="font-bebas text-4xl text-green-400 leading-none"
+                  id="w-approved-ct"
+                >
+                  —
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="section-label">Total Requests</div>
+                <div
+                  class="font-bebas text-4xl text-gold leading-none"
+                  id="w-total-ct"
+                >
+                  —
+                </div>
+              </div>
+            </div>
+            <div class="stat-card overflow-x-auto p-0">
+              <div class="px-5 py-4 border-b border-white/5">
+                <div class="font-semibold text-sm">Withdrawal Requests</div>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Account</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="withdrawals-tbody">
+                  <tr>
+                    <td
+                      colspan="7"
+                      style="
+                        text-align: center;
+                        padding: 32px;
+                        color: rgba(255, 255, 255, 0.25);
+                      "
+                    >
+                      Loading…
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- ══ SETTINGS ══ -->
+          <section class="page-section space-y-5" id="section-settings">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="stat-card space-y-4">
+                <div class="font-semibold mb-1">Site Controls</div>
+                <div
+                  class="flex items-center justify-between py-3 border-b border-white/5"
+                >
+                  <div>
+                    <div class="text-sm font-semibold">
+                      Win Popup Notifications
+                    </div>
+                    <div class="text-white/30 text-xs">
+                      Show live win popups on landing page
+                    </div>
+                  </div>
+                  <label class="toggle"
+                    ><input
+                      type="checkbox"
+                      checked
+                      onchange="settingToggle(this, 'win-popup')" /><span
+                      class="slider"
+                    ></span
+                  ></label>
+                </div>
+                <div
+                  class="flex items-center justify-between py-3 border-b border-white/5"
+                >
+                  <div>
+                    <div class="text-sm font-semibold">New Signups Enabled</div>
+                    <div class="text-white/30 text-xs">
+                      Allow new users to register
+                    </div>
+                  </div>
+                  <label class="toggle"
+                    ><input
+                      type="checkbox"
+                      checked
+                      onchange="settingToggle(this, 'signups')" /><span
+                      class="slider"
+                    ></span
+                  ></label>
+                </div>
+                <div
+                  class="flex items-center justify-between py-3 border-b border-white/5"
+                >
+                  <div>
+                    <div class="text-sm font-semibold">Bitcoin Payments</div>
+                    <div class="text-white/30 text-xs">
+                      Show Bitcoin at checkout
+                    </div>
+                  </div>
+                  <label class="toggle"
+                    ><input
+                      type="checkbox"
+                      checked
+                      onchange="settingToggle(this, 'btc')" /><span
+                      class="slider"
+                    ></span
+                  ></label>
+                </div>
+                <div class="flex items-center justify-between py-3">
+                  <div>
+                    <div class="text-sm font-semibold">Maintenance Mode</div>
+                    <div class="text-white/30 text-xs">
+                      Block all user access
+                    </div>
+                  </div>
+                  <label class="toggle"
+                    ><input
+                      type="checkbox"
+                      onchange="settingToggle(this, 'maintenance')" /><span
+                      class="slider"
+                    ></span
+                  ></label>
+                </div>
+              </div>
+              <div class="stat-card space-y-4">
+                <div class="font-semibold mb-1">Withdrawal PIN</div>
+                <p class="text-white/40 text-xs leading-relaxed">
+                  Change the 5-digit PIN users must enter to confirm a
+                  withdrawal.
+                </p>
+                <div>
+                  <div class="section-label">Current PIN</div>
+                  <input
+                    type="password"
+                    class="input-field"
+                    id="current-pin"
+                    placeholder="Enter current PIN"
+                  />
+                </div>
+                <div>
+                  <div class="section-label">New PIN (5 digits)</div>
+                  <input
+                    type="text"
+                    class="input-field"
+                    id="new-pin"
+                    maxlength="5"
+                    placeholder="e.g. 84921"
+                  />
+                </div>
+                <div>
+                  <div class="section-label">Confirm New PIN</div>
+                  <input
+                    type="text"
+                    class="input-field"
+                    id="confirm-pin"
+                    maxlength="5"
+                    placeholder="Repeat PIN"
+                  />
+                </div>
+                <div id="pin-err" class="text-red-400 text-xs hidden"></div>
+                <button class="btn-gold w-full" onclick="changePIN()">
+                  Update Withdrawal PIN
+                </button>
+              </div>
+              <div class="stat-card space-y-4 md:col-span-2">
+                <div class="font-semibold mb-1">Plan Pricing</div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <div class="section-label">Monthly Price ($)</div>
+                    <input
+                      type="number"
+                      class="input-field"
+                      id="price-monthly"
+                      value="150"
+                    />
+                  </div>
+                  <div>
+                    <div class="section-label">Yearly Price ($)</div>
+                    <input
+                      type="number"
+                      class="input-field"
+                      id="price-yearly"
+                      value="1000"
+                    />
+                  </div>
+                  <div>
+                    <div class="section-label">Lifetime Price ($)</div>
+                    <input
+                      type="number"
+                      class="input-field"
+                      id="price-lifetime"
+                      value="1500"
+                    />
+                  </div>
+                </div>
+                <button class="btn-gold" onclick="savePricing()">
+                  Save Pricing
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+    <!-- end admin-shell -->
 
     <!-- ══ EDIT BALANCE MODAL ══ -->
     <div class="modal-overlay hidden" id="balance-modal">
@@ -1165,9 +1527,8 @@
           </div>
           <div class="flex gap-3 pt-2">
             <button class="btn-gold flex-1" onclick="saveBalance()">
-              Save Changes
-            </button>
-            <button class="btn-ghost" onclick="closeModal('balance-modal')">
+              Save Changes</button
+            ><button class="btn-ghost" onclick="closeModal('balance-modal')">
               Cancel
             </button>
           </div>
@@ -1224,9 +1585,8 @@
           <div id="adduser-err" class="text-red-400 text-xs hidden"></div>
           <div class="flex gap-3 pt-1">
             <button class="btn-gold flex-1" onclick="addUser()">
-              Create User
-            </button>
-            <button class="btn-ghost" onclick="closeModal('adduser-modal')">
+              Create User</button
+            ><button class="btn-ghost" onclick="closeModal('adduser-modal')">
               Cancel
             </button>
           </div>
@@ -1256,18 +1616,131 @@
     ></div>
 
     <script>
-      // your full key═══════════════════════════════════════════════════════
+      const ADMIN_EMAIL = "raymond@gmail.com";
+      const ADMIN_PASSWORD = "Greatness1122!!";
+
+      const SITE_SUPABASE_URL = "https://fcrwercyoiinhtiaqmxf.supabase.co";
+      const SITE_SUPABASE_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjcndlcmN5b2lpbmh0aWFxbXhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMjYyMTgsImV4cCI6MjA5NzkwMjIxOH0.EegX4jnihZOo4XphQl90bWyPL46cTh2jqUTcO2eMUXQ";
+      const { createClient } = supabase;
+      const sb = createClient(SITE_SUPABASE_URL, SITE_SUPABASE_KEY);
+
+      // ── LOGIN ──
+      function toggleLoginPw() {
+        const pw = document.getElementById("login-pw");
+        const eye = document.getElementById("login-eye");
+        if (pw.type === "password") {
+          pw.type = "text";
+          eye.textContent = "🙈";
+        } else {
+          pw.type = "password";
+          eye.textContent = "👁";
+        }
+      }
+
+      function doAdminLogin() {
+        const email = document
+          .getElementById("login-email")
+          .value.trim()
+          .toLowerCase();
+        const pw = document.getElementById("login-pw").value;
+        const err = document.getElementById("login-err");
+        const btn = document.getElementById("login-btn");
+
+        err.textContent = "";
+        if (!email || !pw) {
+          err.textContent = "Please enter your email and password.";
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Verifying…";
+
+        // Small delay for feel
+        setTimeout(() => {
+          if (email === ADMIN_EMAIL && pw === ADMIN_PASSWORD) {
+            sessionStorage.setItem("rp_admin", "1");
+            showAdminPanel();
+          } else {
+            err.textContent = "Invalid email or password.";
+            document.getElementById("login-email").classList.add("error");
+            document.getElementById("login-pw").classList.add("error");
+            btn.disabled = false;
+            btn.textContent = "Access Dashboard";
+          }
+        }, 600);
+      }
+
+      function showAdminPanel() {
+        const screen = document.getElementById("login-screen");
+        screen.style.opacity = "0";
+        screen.style.transition = "opacity 0.4s ease";
+        setTimeout(() => {
+          screen.style.display = "none";
+          const shell = document.getElementById("admin-shell");
+          shell.style.display = "flex";
+          shell.style.opacity = "0";
+          shell.style.transition = "opacity 0.4s ease";
+          requestAnimationFrame(() => {
+            shell.style.opacity = "1";
+          });
+          loadOverview();
+        }, 400);
+      }
+
+      function doLogout() {
+        sessionStorage.removeItem("rp_admin");
+        document.getElementById("admin-shell").style.display = "none";
+        const screen = document.getElementById("login-screen");
+        screen.style.display = "flex";
+        screen.style.opacity = "0";
+        document.getElementById("login-email").value = "";
+        document.getElementById("login-pw").value = "";
+        document.getElementById("login-err").textContent = "";
+        document.getElementById("login-btn").disabled = false;
+        document.getElementById("login-btn").textContent = "Access Dashboard";
+        document.getElementById("login-email").classList.remove("error");
+        document.getElementById("login-pw").classList.remove("error");
+        requestAnimationFrame(() => {
+          screen.style.transition = "opacity 0.3s";
+          screen.style.opacity = "1";
+        });
+      }
+
+      // Allow Enter key on login form
+      document
+        .getElementById("login-email")
+        .addEventListener("keydown", (e) => {
+          if (e.key === "Enter") doAdminLogin();
+        });
+      document.getElementById("login-pw").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") doAdminLogin();
+      });
+
+      // Clear error styling on input
+      ["login-email", "login-pw"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", () => {
+          document.getElementById(id).classList.remove("error");
+          document.getElementById("login-err").textContent = "";
+        });
+      });
+
+      // Check session on load
+      if (sessionStorage.getItem("rp_admin")) {
+        showAdminPanel();
+      }
+
+      // ════════════════════════════════════════════════
       //  STATE
-      // ════════════════════════════════════════════════════════════
-      let allUsers = []; // cache from Supabase
+      // ════════════════════════════════════════════════
+      let allUsers = [];
       let editingUserId = null;
       let userFilter = "";
       let planFilter = "all";
-      let currentPIN = "33211";
 
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       //  NAVIGATION
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       const sections = {
         overview: "Overview",
         users: "Users",
@@ -1304,9 +1777,9 @@
         if (s === "overview") loadOverview();
       }
 
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       //  CLOCK
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       function updateClock() {
         document.getElementById("clock").textContent =
           new Date().toLocaleTimeString("en-US", {
@@ -1317,19 +1790,17 @@
       setInterval(updateClock, 1000);
       updateClock();
 
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       //  OVERVIEW
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       async function loadOverview() {
         const { data: users, error } = await sb
           .from("users")
-          .select("plan, deposited, balance");
+          .select("plan, deposited, balance, status, name, email");
         if (error) {
           console.error(error);
           return;
         }
-        allUsers = users;
-
         const total = users.length;
         const deposited = users.reduce(
           (s, u) => s + parseFloat(u.deposited || 0),
@@ -1339,15 +1810,15 @@
           (s, u) => s + parseFloat(u.balance || 0),
           0,
         );
-
+        const online = users.filter((u) => u.status === "online");
         document.getElementById("ov-total-users").textContent =
           total.toLocaleString();
         document.getElementById("ov-total-deposited").textContent =
           "$" + deposited.toLocaleString();
         document.getElementById("ov-total-balance").textContent =
           "$" + balance.toFixed(2);
-
-        // Plan breakdown
+        document.getElementById("live-count").textContent =
+          online.length + " Online";
         const counts = { monthly: 0, yearly: 0, lifetime: 0 };
         users.forEach((u) => {
           if (counts[u.plan] !== undefined) counts[u.plan]++;
@@ -1360,29 +1831,37 @@
         ]
           .map(
             (p) => `
-    <div>
-      <div class="flex justify-between text-sm mb-1.5"><span class="text-white/60">${cap(p)}</span><span class="font-bold text-gold">${counts[p]}</span></div>
-      <div class="h-2 bg-white/5 rounded-full overflow-hidden">
-        <div class="h-full bg-gradient-to-r from-gold to-gold-dark rounded-full" style="width:${Math.round((counts[p] / max) * 100)}%"></div>
-      </div>
-    </div>
-  `,
+          <div><div class="flex justify-between text-sm mb-1.5"><span class="text-white/60">${cap(p)}</span><span class="font-bold text-gold">${counts[p]}</span></div>
+          <div class="h-2 bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-gold to-gold-dark rounded-full" style="width:${Math.round((counts[p] / max) * 100)}%"></div></div></div>`,
           )
           .join("");
-
-        // Pending withdrawals count
+        document.getElementById("online-users-list").innerHTML = online.length
+          ? online
+              .map(
+                (u) =>
+                  `<div class="flex items-center gap-3 py-2 border-b border-white/4"><div class="w-2 h-2 rounded-full bg-green-400"></div><div><div class="text-sm font-semibold">${u.name || "—"}</div><div class="text-white/30 text-xs">${u.email || ""}</div></div><span class="ml-auto badge ${planBadge(u.plan)}">${(u.plan || "").toUpperCase()}</span></div>`,
+              )
+              .join("")
+          : '<div class="text-white/30 text-sm">No users currently online</div>';
         const { count } = await sb
           .from("withdrawals")
           .select("id", { count: "exact", head: true })
           .eq("status", "pending");
         document.getElementById("ov-pending-w").textContent = count ?? 0;
-        document.getElementById("live-count").textContent =
-          users.filter((u) => u.status === "online").length + " Online";
       }
 
-      // ════════════════════════════════════════════════════════════
+      setInterval(async () => {
+        const { data } = await sb
+          .from("users")
+          .select("id")
+          .eq("status", "online");
+        document.getElementById("live-count").textContent =
+          (data?.length ?? 0) + " Online";
+      }, 30000);
+
+      // ════════════════════════════════════════════════
       //  USERS
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       async function loadUsers() {
         const { data, error } = await sb
           .from("users")
@@ -1409,8 +1888,8 @@
         const filtered = allUsers.filter((u) => {
           const matchText =
             !userFilter ||
-            u.name.toLowerCase().includes(userFilter) ||
-            u.email.toLowerCase().includes(userFilter);
+            (u.name || "").toLowerCase().includes(userFilter) ||
+            (u.email || "").toLowerCase().includes(userFilter);
           const matchPlan = planFilter === "all" || u.plan === planFilter;
           return matchText && matchPlan;
         });
@@ -1418,26 +1897,15 @@
           filtered
             .map(
               (u) => `
-    <tr>
-      <td><div class="font-semibold text-sm">${u.name}</div><div class="text-white/30 text-xs">${u.email}</div></td>
-      <td><span class="badge ${planBadge(u.plan)}">${u.plan.toUpperCase()}</span></td>
-      <td>
-        <div class="flex items-center gap-2">
-          <div style="width:7px;height:7px;border-radius:50%;background:${u.status === "online" ? "#22c55e" : "rgba(255,255,255,.2)"}"></div>
-          <span class="text-xs text-white/50">${u.status}</span>
-        </div>
-      </td>
-      <td class="text-gold font-bold">$${parseFloat(u.deposited || 0).toLocaleString()}</td>
-      <td class="text-green-400 font-bold">$${parseFloat(u.balance || 0).toFixed(2)}</td>
-      <td class="text-white/30 text-xs">${fmtDate(u.joined || u.created_at)}</td>
-      <td>
-        <div class="flex gap-2">
-          <button class="btn-ghost" style="padding:6px 12px;font-size:11px" onclick="openBalanceModal('${u.id}')">Edit Balance</button>
-          <button class="btn-danger" style="padding:6px 12px;font-size:11px" onclick="removeUser('${u.id}')">Remove</button>
-        </div>
-      </td>
-    </tr>
-  `,
+          <tr>
+            <td><div class="font-semibold text-sm">${u.name || "—"}</div><div class="text-white/30 text-xs">${u.email || ""}</div></td>
+            <td><span class="badge ${planBadge(u.plan)}">${(u.plan || "").toUpperCase()}</span></td>
+            <td><div class="flex items-center gap-2"><div style="width:7px;height:7px;border-radius:50%;background:${u.status === "online" ? "#22c55e" : "rgba(255,255,255,.2)"}"></div><span class="text-xs text-white/50">${u.status || "offline"}</span></div></td>
+            <td class="text-gold font-bold">$${parseFloat(u.deposited || 0).toLocaleString()}</td>
+            <td class="text-green-400 font-bold">$${parseFloat(u.balance || 0).toFixed(2)}</td>
+            <td class="text-white/30 text-xs">${fmtDate(u.joined || u.created_at)}</td>
+            <td><div class="flex gap-2"><button class="btn-ghost" style="padding:6px 12px;font-size:11px" onclick="openBalanceModal('${u.id}')">Edit Balance</button><button class="btn-danger" style="padding:6px 12px;font-size:11px" onclick="removeUser('${u.id}')">Remove</button></div></td>
+          </tr>`,
             )
             .join("") ||
           '<tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,.25);padding:32px">No users found</td></tr>';
@@ -1477,17 +1945,19 @@
         }
         err.classList.add("hidden");
         const prices = { monthly: 150, yearly: 1000, lifetime: 1500 };
-        const { error } = await sb.from("users").insert([
-          {
-            name,
-            email,
-            plan,
-            country,
-            deposited: prices[plan],
-            balance: 0,
-            status: "offline",
-          },
-        ]);
+        const { error } = await sb
+          .from("users")
+          .insert([
+            {
+              name,
+              email,
+              plan,
+              country,
+              deposited: prices[plan],
+              balance: 0,
+              status: "offline",
+            },
+          ]);
         if (error) {
           err.textContent = "⚠ " + error.message;
           err.classList.remove("hidden");
@@ -1501,9 +1971,9 @@
         loadUsers();
       }
 
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       //  BALANCES
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       async function loadBalances() {
         const { data, error } = await sb
           .from("users")
@@ -1528,18 +1998,16 @@
           "$" + totalAvail.toFixed(2);
         document.getElementById("bal-deposited-total").textContent =
           "$" + totalDep.toLocaleString();
-
         document.getElementById("balances-tbody").innerHTML = allUsers
           .map(
             (u) => `
-    <tr>
-      <td><div class="font-semibold text-sm">${u.name}</div><div class="text-white/30 text-xs">${u.email}</div></td>
-      <td><span class="badge ${planBadge(u.plan)}">${u.plan.toUpperCase()}</span></td>
-      <td class="text-green-400 font-bold">$${parseFloat(u.balance || 0).toFixed(2)}</td>
-      <td class="text-gold font-bold">$${parseFloat(u.deposited || 0).toLocaleString()}</td>
-      <td><button class="btn-ghost" style="padding:6px 12px;font-size:11px" onclick="openBalanceModal('${u.id}')">Edit</button></td>
-    </tr>
-  `,
+          <tr>
+            <td><div class="font-semibold text-sm">${u.name || "—"}</div><div class="text-white/30 text-xs">${u.email || ""}</div></td>
+            <td><span class="badge ${planBadge(u.plan)}">${(u.plan || "").toUpperCase()}</span></td>
+            <td class="text-green-400 font-bold">$${parseFloat(u.balance || 0).toFixed(2)}</td>
+            <td class="text-gold font-bold">$${parseFloat(u.deposited || 0).toLocaleString()}</td>
+            <td><button class="btn-ghost" style="padding:6px 12px;font-size:11px" onclick="openBalanceModal('${u.id}')">Edit</button></td>
+          </tr>`,
           )
           .join("");
       }
@@ -1549,7 +2017,7 @@
         const u = allUsers.find((x) => x.id === id);
         if (!u) return;
         document.getElementById("bm-user-name").textContent =
-          u.name + " — " + u.email;
+          (u.name || "") + " — " + (u.email || "");
         document.getElementById("bm-available").value = u.balance;
         document.getElementById("bm-deposited").value = u.deposited;
         document.getElementById("balance-modal").classList.remove("hidden");
@@ -1573,7 +2041,6 @@
         toast(
           "Balance updated for " + (u?.name?.split(" ")[0] || "user") + " ✅",
         );
-        // refresh whichever view is active
         loadBalances();
         loadUsers();
       }
@@ -1596,13 +2063,20 @@
         loadBalances();
       }
 
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       //  PAYMENT INFO
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       async function loadPaymentInfo() {
         const { data, error } = await sb.from("payment_info").select("*");
         if (error) {
           toast("Error loading payment info", "#ef4444");
+          return;
+        }
+        if (!data || data.length === 0) {
+          toast(
+            "No payment info rows found — saving will create them automatically.",
+            "#f0b429",
+          );
           return;
         }
         data.forEach((row) => {
@@ -1621,32 +2095,34 @@
       }
 
       async function savePayment(method) {
-        let updates = { updated_at: new Date().toISOString() };
+        const payload = { method, updated_at: new Date().toISOString() };
         if (method === "chime") {
-          updates.field1 = document.getElementById("chime-tag").value.trim();
-          updates.field2 = document.getElementById("chime-phone").value.trim();
+          payload.field1 = document.getElementById("chime-tag").value.trim();
+          payload.field2 = document.getElementById("chime-phone").value.trim();
         } else if (method === "zelle") {
-          updates.field1 = document.getElementById("zelle-email").value.trim();
-          updates.field2 = document.getElementById("zelle-phone").value.trim();
+          payload.field1 = document.getElementById("zelle-email").value.trim();
+          payload.field2 = document.getElementById("zelle-phone").value.trim();
         } else if (method === "apple") {
-          updates.field1 = document.getElementById("apple-id").value.trim();
+          payload.field1 = document.getElementById("apple-id").value.trim();
         } else if (method === "bitcoin") {
-          updates.field1 = document.getElementById("btc-address").value.trim();
+          payload.field1 = document.getElementById("btc-address").value.trim();
         }
         const { error } = await sb
           .from("payment_info")
-          .update(updates)
-          .eq("method", method);
+          .upsert(payload, { onConflict: "method" });
         if (error) {
           toast("Error: " + error.message, "#ef4444");
           return;
         }
-        toast(cap(method) + " info saved ✅");
+        toast(
+          cap(method === "apple" ? "Apple Pay" : method) +
+            " info saved ✅ — site will reflect this instantly",
+        );
       }
 
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       //  WITHDRAWALS
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       async function loadWithdrawals() {
         const { data, error } = await sb
           .from("withdrawals")
@@ -1663,37 +2139,29 @@
         document.getElementById("w-approved-ct").textContent = approved;
         document.getElementById("w-total-ct").textContent = rows.length;
         document.getElementById("ov-pending-w").textContent = pending;
-
         document.getElementById("withdrawals-tbody").innerHTML =
           rows
             .map(
               (w) => `
-    <tr>
-      <td class="font-semibold text-sm">${w.user_name}</td>
-      <td class="text-gold font-bold">$${parseFloat(w.amount || 0).toLocaleString()}</td>
-      <td class="text-white/50 text-xs">${w.method}</td>
-      <td class="text-white/40 text-xs font-mono">${w.account}</td>
-      <td class="text-white/30 text-xs">${fmtDate(w.created_at)}</td>
-      <td><span class="badge ${w.status === "approved" ? "badge-green" : w.status === "pending" ? "badge-gold" : "badge-red"}">${w.status.toUpperCase()}</span></td>
-      <td>
-        ${
-          w.status === "pending"
-            ? `
-          <div class="flex gap-2">
-            <button class="btn-gold" style="padding:6px 12px;font-size:11px" onclick="setWithdrawal('${w.id}','approved')">Approve</button>
-            <button class="btn-danger" style="padding:6px 12px;font-size:11px" onclick="setWithdrawal('${w.id}','rejected')">Reject</button>
-          </div>`
-            : '<span class="text-white/20 text-xs">—</span>'
-        }
-      </td>
-    </tr>
-  `,
+          <tr>
+            <td class="font-semibold text-sm">${w.user_name || "—"}</td>
+            <td class="text-gold font-bold">$${parseFloat(w.amount || 0).toLocaleString()}</td>
+            <td class="text-white/50 text-xs">${w.method || ""}</td>
+            <td class="text-white/40 text-xs font-mono">${w.account || ""}</td>
+            <td class="text-white/30 text-xs">${fmtDate(w.created_at)}</td>
+            <td><span class="badge ${w.status === "approved" ? "badge-green" : w.status === "pending" ? "badge-gold" : "badge-red"}">${(w.status || "").toUpperCase()}</span></td>
+            <td>${
+              w.status === "pending"
+                ? `<div class="flex gap-2"><button class="btn-gold" style="padding:6px 12px;font-size:11px" onclick="setWithdrawal('${w.id}','approved','${w.user_id}',${parseFloat(w.amount || 0)})">Approve</button><button class="btn-danger" style="padding:6px 12px;font-size:11px" onclick="setWithdrawal('${w.id}','rejected','${w.user_id}',0)">Reject</button></div>`
+                : '<span class="text-white/20 text-xs">—</span>'
+            }</td>
+          </tr>`,
             )
             .join("") ||
           '<tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,.25);padding:32px">No withdrawal requests</td></tr>';
       }
 
-      async function setWithdrawal(id, status) {
+      async function setWithdrawal(id, status, userId, amount) {
         const { error } = await sb
           .from("withdrawals")
           .update({ status })
@@ -1702,19 +2170,42 @@
           toast("Error: " + error.message, "#ef4444");
           return;
         }
+        if (status === "approved" && userId && amount > 0) {
+          const { data: userData } = await sb
+            .from("users")
+            .select("balance")
+            .eq("id", userId)
+            .single();
+          if (userData) {
+            const newBal = Math.max(
+              0,
+              parseFloat(userData.balance || 0) - amount,
+            );
+            await sb.from("users").update({ balance: newBal }).eq("id", userId);
+          }
+        }
         toast("Withdrawal " + status + " ✅");
         loadWithdrawals();
       }
 
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       //  SETTINGS
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       function settingToggle(el, key) {
         toast(key.replace("-", " ") + (el.checked ? " enabled" : " disabled"));
       }
 
       let currentPINStore = "33211";
-      function changePIN() {
+
+      async function changePIN() {
+        try {
+          const { data } = await sb
+            .from("settings")
+            .select("value")
+            .eq("key", "withdraw_pin")
+            .single();
+          if (data?.value) currentPINStore = data.value;
+        } catch (e) {}
         const cur = document.getElementById("current-pin").value;
         const nw = document.getElementById("new-pin").value;
         const conf = document.getElementById("confirm-pin").value;
@@ -1735,6 +2226,14 @@
           err.classList.remove("hidden");
           return;
         }
+        const { error } = await sb
+          .from("settings")
+          .upsert({ key: "withdraw_pin", value: nw }, { onConflict: "key" });
+        if (error) {
+          err.textContent = "⚠ " + error.message;
+          err.classList.remove("hidden");
+          return;
+        }
         currentPINStore = nw;
         document.getElementById("current-pin").value = "";
         document.getElementById("new-pin").value = "";
@@ -1746,9 +2245,9 @@
         toast("Pricing saved ✅");
       }
 
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       //  UTILS
-      // ════════════════════════════════════════════════════════════
+      // ════════════════════════════════════════════════
       function closeModal(id) {
         document.getElementById(id).classList.add("hidden");
       }
@@ -1763,13 +2262,12 @@
         setTimeout(() => {
           t.style.opacity = "0";
           t.style.transform = "translateX(-50%) translateY(20px)";
-        }, 3200);
+        }, 3500);
       }
 
       function cap(s) {
         return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
       }
-
       function planBadge(plan) {
         return plan === "lifetime"
           ? "badge-gold"
@@ -1777,7 +2275,6 @@
             ? "badge-blue"
             : "badge-green";
       }
-
       function fmtDate(iso) {
         if (!iso) return "—";
         return new Date(iso).toLocaleDateString("en-US", {
@@ -1787,17 +2284,11 @@
         });
       }
 
-      // close modals on overlay click
       document.querySelectorAll(".modal-overlay").forEach((m) =>
         m.addEventListener("click", (e) => {
           if (e.target === m) m.classList.add("hidden");
         }),
       );
-
-      // ════════════════════════════════════════════════════════════
-      //  INIT
-      // ════════════════════════════════════════════════════════════
-      loadOverview();
     </script>
   </body>
 </html>
