@@ -1929,6 +1929,72 @@
             </button>
           </div>
 
+          <!-- ── Membership ID Verification ── -->
+          <div class="bg-surface border border-white/8 rounded-2xl p-5">
+            <div class="flex items-center justify-between flex-wrap gap-3 mb-3">
+              <div>
+                <div
+                  class="text-[10px] font-bold text-white/30 uppercase tracking-widest"
+                >
+                  Identity Verification
+                </div>
+                <div class="font-bebas text-xl text-white mt-0.5">
+                  UPLOAD MEMBERSHIP ID
+                </div>
+              </div>
+              <span
+                id="id-status-badge"
+                class="bg-white/5 border border-white/10 text-white/40 text-xs font-bold px-3 py-1 rounded-full tracking-widest"
+                >NOT SUBMITTED</span
+              >
+            </div>
+            <p class="text-white/40 text-sm mb-4">
+              Upload a photo of your government-issued ID to verify your VIP
+              membership. Our team reviews submissions within 24 hours.
+            </p>
+            <div class="flex flex-col sm:flex-row items-stretch gap-3">
+              <label
+                class="flex-1 flex items-center gap-3 border border-dashed border-white/15 rounded-xl px-4 py-3 cursor-pointer hover:border-gold/50 transition-colors"
+              >
+                <span class="text-xl">📎</span>
+                <span id="id-file-label" class="text-white/40 text-sm truncate"
+                  >Choose a photo of your ID…</span
+                >
+                <input
+                  type="file"
+                  id="id-file-input"
+                  accept="image/*"
+                  class="hidden"
+                  onchange="onIdFileSelected(this)"
+                />
+              </label>
+              <button
+                onclick="uploadMembershipId()"
+                id="id-upload-btn"
+                class="flex-shrink-0 bg-gradient-to-r from-gold to-gold-dark text-ink font-bold px-6 py-3 rounded-xl text-sm hover:opacity-90 transition-opacity whitespace-nowrap"
+              >
+                Upload ID
+              </button>
+            </div>
+            <div
+              id="id-upload-err"
+              class="hidden text-red-400 text-xs mt-3"
+            ></div>
+            <div id="id-preview-wrap" class="hidden mt-4">
+              <div
+                class="text-white/30 text-[10px] uppercase tracking-widest mb-2"
+              >
+                Last Submitted
+              </div>
+              <img
+                id="id-preview-img"
+                src=""
+                alt="Submitted ID"
+                class="w-32 h-20 object-cover rounded-lg border border-white/10"
+              />
+            </div>
+          </div>
+
           <div class="bg-surface border border-white/8 rounded-2xl p-5">
             <div
               class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-4"

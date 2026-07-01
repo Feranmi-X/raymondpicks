@@ -10,6 +10,9 @@ const sbSite = window.supabase.createClient(SITE_SUPABASE_URL, SITE_SUPABASE_KEY
 // Admin email (only this email sees the Admin nav link)
 const ADMIN_EMAIL = "raymond@hgmail.com";
 
+// Supabase Storage bucket used for membership ID uploads
+const ID_BUCKET = "membership-ids";
+
 // ─────────────────────────────────────────────────────────────────────
 // DATA
 // ─────────────────────────────────────────────────────────────────────
@@ -77,6 +80,8 @@ const faqData = [
 // ─────────────────────────────────────────────────────────────────────
 let isDark = true, selPlan = "yearly", selPayment = null, wIdx = 0, wTimer = null,
     currentSport = "all", userPlan = "monthly", currentUser = null, menuOpen = false;
+
+let selectedIdFile = null; // holds the File object picked in the ID upload input
 
 const paymentDetails = {
   chime:    { tag: "$RaymondPicks", phone: "(305) 555-0142" },
@@ -349,6 +354,198 @@ async function approveRequest(id) {
   showToast("Request approved ✅");
 }
 
+// ─────────────────────────────────────────────────────────────────────
+// MEMBERSHIP ID VERIFICATION (member side)
+// ─────────────────────────────────────────────────────────────────────
+function onIdFileSelected(input) {
+  const file = input.files && input.files[0];
+  const label = document.getElementById("id-file-label");
+  const err = document.getElementById("id-upload-err");
+  err.classList.add("hidden");
+
+  if (!file) {
+    selectedIdFile = null;
+    label.textContent = "Choose a photo of your ID…";
+    return;
+  }
+  if (!file.type.startsWith("image/")) {
+    err.textContent = "⚠ Please select an image file (JPG, PNG, etc).";
+    err.classList.remove("hidden");
+    input.value = "";
+    selectedIdFile = null;
+    label.textContent = "Choose a photo of your ID…";
+    return;
+  }
+  if (file.size > 8 * 1024 * 1024) {
+    err.textContent = "⚠ File is too large. Max size is 8MB.";
+    err.classList.remove("hidden");
+    input.value = "";
+    selectedIdFile = null;
+    label.textContent = "Choose a photo of your ID…";
+    return;
+  }
+
+  selectedIdFile = file;
+  label.textContent = file.name;
+  label.classList.remove("text-white/40");
+  label.classList.add("text-white");
+}
+
+async function uploadMembershipId() {
+  const err = document.getElementById("id-upload-err");
+  const btn = document.getElementById("id-upload-btn");
+  err.classList.add("hidden");
+
+  if (!currentUser) {
+    err.textContent = "⚠ Please sign in first.";
+    err.classList.remove("hidden");
+    return;
+  }
+  if (!selectedIdFile) {
+    err.textContent = "⚠ Please choose a photo of your ID first.";
+    err.classList.remove("hidden");
+    return;
+  }
+
+  const originalLabel = btn.textContent;
+  btn.textContent = "Uploading...";
+  btn.disabled = true;
+  btn.classList.add("opacity-60", "cursor-not-allowed");
+
+  try {
+    const ext = (selectedIdFile.name.split(".").pop() || "jpg").toLowerCase();
+    const path = `${currentUser.id}/${Date.now()}.${ext}`;
+
+    const { error: upErr } = await sbSite
+      .storage
+      .from(ID_BUCKET)
+      .upload(path, selectedIdFile, { upsert: true, contentType: selectedIdFile.type });
+
+    if (upErr) {
+      err.textContent = "⚠ Upload failed: " + upErr.message;
+      err.classList.remove("hidden");
+      return;
+    }
+
+    const { data: pub } = sbSite.storage.from(ID_BUCKET).getPublicUrl(path);
+    const fileUrl = pub && pub.publicUrl ? pub.publicUrl : "";
+
+    const { error: dbErr } = await sbSite.from("id_verifications").insert([{
+  user_id: currentUser.id,
+  user_name: currentUser.name,
+  user_email: currentUser.email,
+  file_path: path,
+  image_url: fileUrl,     // ← matches admin.html now
+  status: "pending",
+}]);
+
+
+
+    if (dbErr) {
+      err.textContent = "⚠ " + dbErr.message;
+      err.classList.remove("hidden");
+      return;
+    }
+
+    document.getElementById("id-preview-img").src = fileUrl; // fileUrl variable itself is fine, just the DB column changed
+    document.getElementById("id-preview-wrap").classList.remove("hidden");
+    setIdStatusBadge("pending");
+    showToast("ID submitted for review ✅");
+
+    selectedIdFile = null;
+    document.getElementById("id-file-input").value = "";
+    const label = document.getElementById("id-file-label");
+    label.textContent = "Choose a photo of your ID…";
+    label.classList.add("text-white/40");
+    label.classList.remove("text-white");
+  } catch (e) {
+    err.textContent = "⚠ Connection error. Please try again.";
+    err.classList.remove("hidden");
+  } finally {
+    btn.textContent = originalLabel;
+    btn.disabled = false;
+    btn.classList.remove("opacity-60", "cursor-not-allowed");
+  }
+}
+
+function setIdStatusBadge(status) {
+  const badge = document.getElementById("id-status-badge");
+  if (!badge) return;
+  const map = {
+    pending:  { text: "PENDING REVIEW", cls: "bg-yellow-400/10 border-yellow-400/25 text-yellow-400" },
+    approved: { text: "VERIFIED ✓",     cls: "bg-green-400/10 border-green-400/25 text-green-400" },
+    declined: { text: "DECLINED",       cls: "bg-red-400/10 border-red-400/25 text-red-400" },
+    none:     { text: "NOT SUBMITTED",  cls: "bg-white/5 border-white/10 text-white/40" },
+  };
+  const s = map[status] || map.none;
+  badge.textContent = s.text;
+  badge.className = "text-xs font-bold px-3 py-1 rounded-full tracking-widest border " + s.cls;
+}
+
+async function loadIdStatus() {
+  if (!currentUser) return;
+  try {
+    const { data, error } = await sbSite
+      .from("id_verifications")
+      .select("*")
+      .eq("user_id", currentUser.id)
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (error || !data || !data.length) { setIdStatusBadge("none"); return; }
+
+    const rec = data[0];
+    setIdStatusBadge(rec.status);
+    if (rec.file_url) {
+  document.getElementById("id-preview-img").src = rec.file_url;
+  
+}
+  } catch (e) { setIdStatusBadge("none"); }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// MEMBERSHIP ID VERIFICATION (admin side)
+// ─────────────────────────────────────────────────────────────────────
+async function loadIdVerifications() {
+  const el = document.getElementById("admin-idverify-list");
+  if (!el) return;
+  el.innerHTML = `<div class="text-white/40 text-sm p-4">Loading submissions...</div>`;
+  try {
+    const { data, error } = await sbSite.from("id_verifications").select("*").order("created_at", { ascending: false });
+    if (error || !data) { el.innerHTML = `<div class="text-red-400 text-sm p-4">Error loading data.</div>`; return; }
+    if (!data.length) { el.innerHTML = `<div class="text-white/40 text-sm p-4">No submissions yet.</div>`; return; }
+
+    el.innerHTML = data.map(r => `
+      <div class="flex flex-wrap items-center gap-3 p-4 border-b border-white/5 hover:bg-white/3 transition-colors">
+        <a href="${r.file_url}" target="_blank" rel="noopener" class="flex-shrink-0">
+          <img src="${r.file_url}" class="w-16 h-11 object-cover rounded-lg border border-white/10" alt="ID" />
+        </a>
+        <div class="flex-1 min-w-0">
+          <div class="font-semibold text-white text-sm truncate">${r.user_name || "—"}</div>
+          <div class="text-white/40 text-xs truncate">${r.user_email || ""}</div>
+        </div>
+        <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-full border ${
+          r.status === "approved" ? "bg-green-400/10 border-green-400/25 text-green-400" :
+          r.status === "declined" ? "bg-red-400/10 border-red-400/25 text-red-400" :
+          "bg-yellow-400/10 border-yellow-400/25 text-yellow-400"
+        }">${r.status}</span>
+        ${r.status === "pending" ? `
+          <button onclick="reviewIdVerification('${r.id}','approved')" class="text-green-400 text-xs border border-green-400/30 hover:border-green-400/60 rounded-lg px-2 py-1 transition-colors">Approve</button>
+          <button onclick="reviewIdVerification('${r.id}','declined')" class="text-red-400 text-xs border border-red-400/30 hover:border-red-400/60 rounded-lg px-2 py-1 transition-colors">Decline</button>
+        ` : `
+          <button onclick="reviewIdVerification('${r.id}','pending')" class="text-white/40 text-xs border border-white/15 hover:border-white/40 rounded-lg px-2 py-1 transition-colors">Reset</button>
+        `}
+      </div>
+    `).join("");
+  } catch (e) { el.innerHTML = `<div class="text-red-400 text-sm p-4">Connection error.</div>`; }
+}
+
+async function reviewIdVerification(id, status) {
+  await sbSite.from("id_verifications").update({ status, reviewed_at: new Date().toISOString() }).eq("id", id);
+  loadIdVerifications();
+  showToast("ID marked as " + status + " ✅");
+}
+
 async function savePaymentSettings() {
   const fields = [
     { method:"chime",   field1: document.getElementById("a-chime-tag").value.trim(),   field2: document.getElementById("a-chime-phone").value.trim() },
@@ -615,6 +812,7 @@ function loadDashboard(data) {
   updateNavLoggedIn();
   switchDashPlan(userPlan, true);
   injectDashboardFooter();
+  loadIdStatus();
 }
 
 function injectDashboardFooter() {
